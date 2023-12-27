@@ -102,9 +102,9 @@ public class ClienteController {
         //Y las entidades que debe mostrar
         model.addAttribute("cliente",cliente);
         //Ademas de un titulo de lo que se esta mostrando
-        model.addAttribute("operacion","Categorias Resgistradas");
+        model.addAttribute("operacion","Clientes Resgistrados");
         //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
-        return "categoria/lista-categoria";
+        return "cliente/lista-cliente";
     }
 
     @GetMapping("modificar-cliente/{id}")
@@ -125,7 +125,7 @@ public class ClienteController {
         ClienteEntity cliente = clienteService.buscarClienteId(id);
         if (cliente != null) {
             clienteService.borrar(id);
-            redirectAttributes.addFlashAttribute("success", "Categoria borrada exitosamente!");
+            redirectAttributes.addFlashAttribute("success", "Cliente borrado exitosamente!");
         }
         return "redirect:/cliente/lista-cliente";
     }

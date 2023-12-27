@@ -16,7 +16,7 @@ public class ClienteServiceImpl implements ClienteService{
 
     @Override
     public Page<ClienteEntity> findAll(Pageable pageable) {
-        return null;
+        return clienteRepository.findAll(pageable);
     }
 
     @Override
@@ -28,12 +28,12 @@ public class ClienteServiceImpl implements ClienteService{
 
     @Override
     public void borrar(Integer id) {
-
+        clienteRepository.deleteById(id);
     }
 
     @Override
     public ClienteEntity buscarClienteId(Integer id) {
-        return null;
+        return clienteRepository.findById(id).get();
     }
 
     @Override
