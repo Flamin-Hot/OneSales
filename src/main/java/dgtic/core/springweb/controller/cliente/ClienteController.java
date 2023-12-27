@@ -4,18 +4,21 @@ import dgtic.core.springweb.model.CategoriaEntity;
 import dgtic.core.springweb.model.ClienteEntity;
 import dgtic.core.springweb.model.UsuarioEntity;
 import dgtic.core.springweb.service.cliente.ClienteService;
+import dgtic.core.springweb.util.RenderPagina;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("cliente")
@@ -79,6 +82,52 @@ public class ClienteController {
             }
             return "cliente/alta-cliente";
         }
+    }
+
+    @GetMapping("lista-cliente")
+    //Recibe la session del controlador post de login
+    public String paginaLista(@RequestParam(name = "page",defaultValue = "0") int page, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
+
+        if (usuarioEntity != null) {
+            model.addAttribute("usuarioEntity", usuarioEntity);
+        }
+
+        Pageable pagReq = PageRequest.of(page,5);
+        Page<ClienteEntity> cliente = clienteService.findAll(pagReq);
+        RenderPagina<ClienteEntity> render = new RenderPagina<>("lista-cliente",cliente);
+        //Mandamos al front lo que queremos que se muestre
+        model.addAttribute("page",render);
+        //Y las entidades que debe mostrar
+        model.addAttribute("cliente",cliente);
+        //Ademas de un titulo de lo que se esta mostrando
+        model.addAttribute("operacion","Categorias Resgistradas");
+        //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
+        return "categoria/lista-categoria";
+    }
+
+    @GetMapping("modificar-cliente/{id}")
+    public String saltoModificar(@PathVariable("id") Integer id, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
+
+        if (usuarioEntity != null) {
+            model.addAttribute("usuarioEntity", usuarioEntity);
+        }
+        ClienteEntity cliente = clienteService.buscarClienteId(id);
+        model.addAttribute("clienteEntity", cliente);
+        return "cliente/alta-cliente";
+    }
+
+    @GetMapping("borrar-cliente/{id}")
+    public String borrarCliente(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
+        ClienteEntity cliente = clienteService.buscarClienteId(id);
+        if (cliente != null) {
+            clienteService.borrar(id);
+            redirectAttributes.addFlashAttribute("success", "Categoria borrada exitosamente!");
+        }
+        return "redirect:/cliente/lista-cliente";
     }
     
 }

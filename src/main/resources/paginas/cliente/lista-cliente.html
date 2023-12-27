@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Alta Categoría</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
+    <link th:href="@{/tema/headers.css}" rel="stylesheet">
+</head>
+<body>
+<!-- Header -->
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/aplicacion" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <img class="me-2" th:src="@{/imagen/logo.png}" alt="" width="50" height="50">
+            <span th:text="Bienvenido + ' ' + ${usuarioEntity.nombre} + '!'" class="fs-4 fw-bold"></span>
+        </a>
+        <div class="col-lg-6">
+            <nav class="navbar navbar-expand-lg">
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categorias</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li th:if="${usuarioEntity.tipoUsuario}">
+                                    <a class="dropdown-item" th:href="@{/categoria/alta-categoria}">Alta Categoria</a>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/categoria/lista-categoria}">Lista Categorias</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown2">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink2" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
+                                <li th:if="${usuarioEntity.tipoUsuario}">
+                                    <a class="dropdown-item" th:href="@{/producto/alta-producto}">Alta Productos</a>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/producto/lista-producto}">Lista Productos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown3">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink3" role="button" data-bs-toggle="dropdown" aria-expanded="false">Clientes</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink3">
+                                <li><a class="dropdown-item" th:href="@{/cliente/alta-cliente}">Alta Clientes</a></li>
+                                <li><a class="dropdown-item" th:href="@{/cliente/lista-cliente}">Lista Clientes</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Botón de cierre de sesión -->
+                <div class="d-flex">
+                    <form th:action="@{/logout}" method="post">
+                        <input type="submit" value="Cerrar sesión" class="btn btn-danger"/>
+                    </form>
+                </div>
+            </nav>
+        </div>
+    </header>
+</div>
+<!-- Main Content -->
+<main class="container d-flex flex-column align-items-center justify-content-center text-center">
+    <div class="alert alert-success text-center" th:if="${success != null}" th:text="${success}"></div>
+    <h1 th:text="${operacion}"></h1>
+    <table th:if="${!cliente.isEmpty()}" class="table table-striped table-hover table-sm">
+        <thead class="table table-bordered">
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellido</th>
+            <th scope="col">Email</th>
+            <th scope="col">Teléfono</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cl: ${cliente}">
+            <td th:text="${cl.nombre}"></td>
+            <td th:text="${cl.apellido}"></td>
+            <td th:text="${cl.email}"></td>
+            <td th:text="${cl.telefono}"></td>
+            <td>
+                <a th:href="@{/cliente/modificar-cliente/{id} (id=${cl.id})}"
+                   class="btn btn-outline-success"
+                   th:disabled="${!usuarioEntity.tipoUsuario}"
+                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                >
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
+                </a>
+
+                <a th:href="@{/cliente/borrar-cliente/{id} (id=${cl.id})}"
+                   class="btn btn-outline-danger"
+                   th:disabled="${!usuarioEntity.tipoUsuario}"
+                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                >
+                    <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav th:replace="plantillas/pag-nav:: paginador " class="mt-3 d-flex justify-content-center"></nav>
+</main>
+
+<script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
+<script th:src="@{/bootstrap/js/popper.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+</body>
+</html>
