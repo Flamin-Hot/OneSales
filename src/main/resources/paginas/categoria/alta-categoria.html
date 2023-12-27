@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Alta Categoría</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
+    <link th:href="@{/tema/headers.css}" rel="stylesheet">
+</head>
+<body>
+<!-- Header -->
+<div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+        <a href="/aplicacion" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+            <img class="me-2" th:src="@{/imagen/logo.png}" alt="" width="50" height="50">
+            <span th:text="Bienvenido + ' ' + ${usuarioEntity.nombre} + '!'" class="fs-4 fw-bold"></span>
+        </a>
+        <div class="col-lg-6">
+            <nav class="navbar navbar-expand-lg">
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                        aria-controls="navbarNavDropdown" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categorias</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li th:if="${usuarioEntity.tipoUsuario}">
+                                    <a class="dropdown-item" th:href="@{/categoria/alta-categoria}">Alta Categoria</a>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/categoria/lista-categoria}">Lista Categorias</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown2">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink2" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink2">
+                                <li th:if="${usuarioEntity.tipoUsuario}">
+                                    <a class="dropdown-item" th:href="@{/producto/alta-producto}">Alta Productos</a>
+                                </li>
+                                <li><a class="dropdown-item" th:href="@{/producto/lista-producto}">Lista Productos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown3">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink3" role="button" data-bs-toggle="dropdown" aria-expanded="false">Clientes</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink3">
+                                <li><a class="dropdown-item" th:href="@{/cliente/alta-cliente}">Alta Clientes</a></li>
+                                <li><a class="dropdown-item" th:href="@{/cliente/lista-cliente}">Lista Clientes</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Botón de cierre de sesión -->
+                <div class="d-flex">
+                    <form th:action="@{/logout}" method="post">
+                        <input type="submit" value="Cerrar sesión" class="btn btn-danger"/>
+                    </form>
+                </div>
+            </nav>
+        </div>
+    </header>
+</div>
+
+<!-- Main Content -->
+<main class="container d-flex flex-column align-items-center justify-content-center text-center">
+    <!-- Error global -->
+    <div th:if="${warning}" class="alert alert-danger">
+        <p th:text="${warning}"></p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card mx-auto" style="width: 85%;">
+        <h4 class="card-header text-center"><strong>Registrar Categoría</strong></h4>
+        <div class="card-body">
+            <!-- con el action indicamos que al presionar guardar spring debe encontrar un controlador
+            que maneje dicha solicitud. La solicitud es un post porque el action intenta guardar una categoría en la base de datos-->
+            <form th:action="@{/categoria/formulario}" th:object="${categoriaEntity}" method="post">
+                <div class="row">
+                    <div class="col-md-5 mx-auto">
+                        <div class="form-group">
+                            <label for="nombre" class="align-middle">Nombre</label>
+                            <input type="text" class="form-control text-center"
+                                   id="nombre" name="nombre"
+                                   th:field="*{nombre}"
+                                   placeholder="Nombre de la Categoría"
+                                   required="true">
+                            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-5 mx-auto">
+                        <div class="form-group">
+                            <label for="descripcion" class="align-middle">Descripción</label>
+                            <input type="text" class="form-control text-center"
+                                   id="descripcion" name="descripcion"
+                                   th:field="*{descripcion}"
+                                   placeholder="Descripción de la Categoría"
+                                   required="true">
+                            <small th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mx-auto mt-3">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+                <input type="hidden" name="id" th:field="*{id}"/>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
+<script th:src="@{/bootstrap/js/popper.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+</body>
+</html>

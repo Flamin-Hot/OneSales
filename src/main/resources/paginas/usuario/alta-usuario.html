@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Alta Usuario</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/tema/headers.css}" rel="stylesheet">
+</head>
+<body>
+<main>
+    <!--Header-->
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <img class="me-2" th:src="@{/imagen/logo.png}" alt="" width="50" height="50">
+                <!-- Con el signo de $ accedemos al contenido que se mando desde el controlador a esta vista -->
+                <span th:text="${metodo}" class="fs-4 fw-bold"></span>
+            </a>
+        </header>
+    </div>
+
+    <!-- Error global -->
+    <div th:if="${warning}" class="alert alert-danger">
+        <p th:text="${warning}"></p>
+    </div>
+
+    <!-- Formulario -->
+    <div class="card"  style="margin-left: 80px; margin-right: 80px;">
+        <h4 class="card-header text-center"><strong>Formulario de Registro</strong></h4>
+        <div class="card-body" style="margin: 20px;">
+            <!-- con el action indicamos que al presionar guardar spring debe encontrar un controlador
+            que maneje dicha solicitud. La solicitud es un post porque el actio intenta guardar un usuario en la base de datos-->
+            <form th:action="@{/usuario/formulario}" th:object="${usuarioEntity}" method="post">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" class="form-control"
+                                   id="nombre" name="nombre"
+                                   th:field="*{nombre}"
+                                   placeholder="Nombre del Usuario">
+                            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" class="form-control"
+                                   id="apellido" name="apellido"
+                                   th:field="*{apellido}"
+                                   placeholder="Apellido">
+                            <small th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control"
+                                   id="email" name="email"
+                                   th:field="*{email}"
+                                   placeholder="usario@mail.com">
+                            <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="contraseña">Contraseña</label>
+                            <input type="text" class="form-control"
+                                   id="contraseña" name="contraseña"
+                                   th:field="*{contraseña}"
+                                   placeholder="A@1">
+                            <small th:if="${#fields.hasErrors('contraseña')}" th:errors="*{contraseña}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-md-3 mt-3">
+                        <div class="form-group">
+                            <label class="form-check-label" for="tipoUsuario">
+                                ¿El usuario es administrador?
+                            </label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{tipoUsuario}" id="tipoUsuario" name="tipoUsuario">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mt-5">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+                <input type="hidden" name="id" th:field="*{id}"/>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>
