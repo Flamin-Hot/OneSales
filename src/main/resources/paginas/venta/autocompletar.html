@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="es">
+<body>
+<script type="text/javascript" th:fragment="jscliente">
+  $(document).ready(function(){
+      $("#cliente").autocomplete({
+          source: function(request,response){
+              $.ajax({
+                  url:"/venta/buscar-cliente/"+request.term,
+                  dataType:"json",
+                  data:{
+                      term: request.term
+                  },
+                  success: function(data){
+                      response($.map(data,function(item){
+                          return{
+                              value:item.id,
+                              label:item.email,
+                          };
+                      }));
+                  },
+              });
+          },
+          select: function(event,ui){
+              $("#cliente").val(ui.item.label);
+              $("#idCliente").val(ui.item.value);
+              return false;
+          }
+      });
+  });
+</script>
+<script type="text/javascript" th:fragment="jsproducto">
+  $(document).ready(function(){
+      $("#producto").autocomplete({
+          source: function(request,response){
+              $.ajax({
+                  url:"/venta/buscar-producto/"+request.term,
+                  dataType:"json",
+                  data:{
+                      term: request.term
+                  },
+                  success: function(data){
+                      response($.map(data,function(item){
+                          return{
+                              value:item.id,
+                              label:item.nombre,
+                          };
+                      }));
+                  },
+              });
+          },
+          select: function(event,ui){
+              $("#producto").val(ui.item.label);
+              $("#idProducto").val(ui.item.value);
+              return false;
+          }
+      });
+  });
+</script>
+<script type="text/javascript" th:fragment="jseliminarventa">
+  $(document).ready(function() {
+      $("a").click(function(event) {
+          event.preventDefault();
+
+          var nuevaUrl = $(this).attr("href");
+
+          $.ajax({
+              url: "/venta/eliminar-venta", // Ruta para eliminar la venta
+              method: "GET",
+              success: function() {
+                  window.location.href = nuevaUrl;
+              },
+              error: function() {
+                  console.log("Error al eliminar la venta.");
+              }
+          });
+      });
+  });
+</script>
+</body>
+</html>

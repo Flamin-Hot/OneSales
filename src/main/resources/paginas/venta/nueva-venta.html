@@ -81,17 +81,53 @@
         </div>
     </header>
 </div>
-
 <!-- Main Content -->
 <main class="text-center">
-    <h1>Bienvenido a One Sales</h1>
-    <img th:src="@{/imagen/poro.jpg}" width="600" height="300">
+    <div class="card mx-auto" style="width: 85%">
+        <h4 class="card-header"><strong>Nueva Venta</strong></h4>
+        <div class="card-body">
+            <form th:action="@{/venta/nueva-venta}" th:object=${ventaEntity} method="post">
+                <input type="hidden" th:field="*{usuario.id}" />
+                <input type="hidden" th:field="*{total}" />
+                <input type="hidden" th:field="*{fecha}" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Vendedor:</label><br/>
+                            <div id="usuario" th:text="${usuarioEntity.nombre}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="cliente">Cliente:</label>
+                            <input type="text" class="form-control text-center"
+                                   id="cliente" name="cliente"
+                                   th:field="*{cliente.email}"
+                                   placeholder="Correo del Cliente"
+                                   required="true">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Fecha:</label>
+                            <div id="fecha" th:text="${#dates.format(ventaEntity.fecha, 'yyyy-MM-dd')}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center mt-3">
+                        <button type="submit" class="btn btn-primary">Iniciar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </main>
-    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
-    <script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
-    <script th:src="@{/bootstrap/js/popper.min.js}"></script>
-    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
-    <script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script th:src="@{/bootstrap/js/popper.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
+<script th:replace="venta/autocompletar :: jscliente"></script>
 </body>
 </html>
-

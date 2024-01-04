@@ -35,14 +35,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeRequests()
-                .requestMatchers("/bootstrap/**").permitAll()
-                .requestMatchers("/imagen/**").permitAll()
-                .requestMatchers("/tema/**").permitAll()
-                .requestMatchers("/usuario/alta-usuario").permitAll()
-                .requestMatchers(HttpMethod.POST,"/usuario/formulario").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/bootstrap/**").permitAll()
+                                .requestMatchers("/imagen/**").permitAll()
+                                .requestMatchers("/tema/**").permitAll()
+                                .requestMatchers("/usuario/alta-usuario").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/usuario/formulario").permitAll()
+                                .anyRequest().authenticated()
+                )
                 .formLogin(formLogin ->
                         formLogin.loginPage("/")
                                 .loginProcessingUrl("/login")
@@ -53,8 +54,11 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
+                        .clearAuthentication(true)
                         .permitAll());
+
         return httpSecurity.build();
     }
+
 
 }

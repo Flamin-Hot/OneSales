@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductoServiceImpl implements ProductoService{
 
@@ -31,5 +33,10 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public ProductoEntity buscarProductoId(Integer id) {
         return productoRepository.findById(id).get();
+    }
+
+    @Override
+    public List<ProductoEntity> buscarProductoPatron(String patron) {
+        return productoRepository.findByNombrePatron(patron);
     }
 }

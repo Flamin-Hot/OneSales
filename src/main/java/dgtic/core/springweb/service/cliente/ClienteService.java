@@ -13,4 +13,5 @@ public interface ClienteService {
     void borrar(Integer id);
     ClienteEntity buscarClienteId(Integer id);
     List<ClienteEntity> buscarClientes();
+    List<ClienteEntity> buscarClientePatron(String patron);
 }
