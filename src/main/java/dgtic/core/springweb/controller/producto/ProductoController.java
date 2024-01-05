@@ -124,7 +124,6 @@ public class ProductoController {
         }
 
         ProductoEntity producto = productoService.buscarProductoId(id);
-        System.out.println(producto.getInventario());
         model.addAttribute("productoEntity", producto);
         //llenar el select de hoteles
         List<CategoriaEntity> select=categoriaService.buscarCategoria();

@@ -3,18 +3,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Categorias</title>
+    <title>Ventas</title>
     <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
     <link th:href="@{/tema/headers.css}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        .btn-disabled {
-            pointer-events: none;
-            cursor: not-allowed;
-            opacity: 0.5;
+        .btn-outline-blue {
+            color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-outline-blue:hover {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
 <!-- Header -->
@@ -94,39 +98,36 @@
 <!-- Main Content -->
 <main class="container d-flex flex-column align-items-center justify-content-center text-center">
     <h1 th:text="${operacion}"></h1>
-    <table th:if="${!producto.isEmpty()}" class="table table-striped table-hover table-sm">
+    <div th:if="${error}" class="alert alert-danger">
+        <p th:text="${error}"></p>
+    </div>
+    <div th:if="${success}" class="alert alert-success">
+        <p th:text="${success}"></p>
+    </div>
+    <table th:if="${!venta.isEmpty()}" class="table table-striped table-hover table-sm">
         <thead class="table table-bordered">
         <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Descripción</th>
-            <th scope="col">Precio</th>
-            <th scope="col">Stock</th>
-            <th scope="col">Categoria</th>
+            <th scope="col">Ticket</th>
+            <th scope="col">Vendedor</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Total</th>
             <th scope="col">Operaciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="pr: ${producto}">
-            <td th:text="${pr.nombre}"></td>
-            <td th:text="${pr.descripcion}"></td>
-            <td th:text="${pr.precio}"></td>
-            <td th:text="${pr.getInventario().getStock()}"></td>
-            <td th:text="${pr.getCategoria().getNombre()}"></td>
+        <tr th:each="ve: ${venta}">
+            <td th:text="${ve.id}"></td>
+            <td th:text="${ve.usuario.nombre}"></td>
+            <td th:text="${ve.cliente.email}"></td>
+            <td th:text="${#dates.format(ve.fecha, 'yyyy-MM-dd')}"></td>
+            <td th:text="${ve.total}"></td>
             <td>
-                <a th:href="@{/producto/modificar-producto/{id} (id=${pr.id})}"
-                   class="btn btn-outline-success"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
-                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
+                <a th:href="@{/venta/detalle-venta/{id} (id=${ve.id})}" class="btn btn-outline-success">
+                    <i class="fas fa-table" aria-hidden="true"></i> Detalle
                 </a>
-
-                <a th:href="@{/producto/borrar-producto/{id} (id=${pr.id})}"
-                   class="btn btn-outline-danger"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
-                    <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
+                <a th:href="@{/venta/enviar-mail/{id} (id=${ve.id})}" class="btn btn-outline-blue">
+                    <i class="fas fa-envelope" aria-hidden="true"></i> Enviar
                 </a>
             </td>
         </tr>

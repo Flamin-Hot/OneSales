@@ -1,24 +1,31 @@
 package dgtic.core.springweb.controller.venta;
 
 import dgtic.core.springweb.model.*;
-import dgtic.core.springweb.repository.ClienteRepository;
-import dgtic.core.springweb.repository.ProductoRepository;
+import dgtic.core.springweb.repository.*;
 import dgtic.core.springweb.service.cliente.ClienteService;
 import dgtic.core.springweb.service.producto.ProductoService;
 import dgtic.core.springweb.service.venta.VentaService;
+import dgtic.core.springweb.util.RenderPagina;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping("venta")
@@ -36,7 +43,11 @@ public class VentaController {
     ClienteRepository clienteRepository;
 
     @Autowired
-    ProductoRepository productoRepository;
+    VentaRepository ventaRepository;
+
+    @Autowired
+    DetalleVentaRepository detalleVentaRepository;
+
 
     @GetMapping("nueva-venta")
     public String nuevaVenta(Model model, HttpSession session){
@@ -48,7 +59,6 @@ public class VentaController {
         venta.setTotal(0.0);
         venta.setFecha(new Date());
 
-        // Almacenar la venta en la sesión
         session.setAttribute("venta", venta);
 
         model.addAttribute("usuarioEntity", usuarioEntity);
@@ -60,10 +70,10 @@ public class VentaController {
     @PostMapping("nueva-venta")
     public String nuevaVenta(@ModelAttribute("ventaEntity") VentaEntity venta, HttpSession session){
         VentaEntity ventaSession = (VentaEntity) session.getAttribute("venta");
-        // Tomamos el correo ingresado en el formulario para asignarlo al objeto que ya teníamos en sesión
+
         ClienteEntity cliente = clienteRepository.findClienteByEmail(venta.getCliente().getEmail());
         ventaSession.setCliente(cliente);
-        // Guardamos la venta en la sesión antes de redirigir
+
         session.setAttribute("ventaNueva", ventaService.nuevaVenta(ventaSession));
         session.setAttribute("ventaIniciada", true);
         return "redirect:/venta/detalle-venta";
@@ -72,9 +82,7 @@ public class VentaController {
     @GetMapping("detalle-venta")
     public String detalleVenta(Model model, HttpSession session) {
 
-        // Comprueba si la venta existe en la sesión
         if (session.getAttribute("ventaIniciada") == null) {
-            // Redirige a nueva-venta si no existe
             return "redirect:/venta/nueva-venta";
         }
 
@@ -106,45 +114,39 @@ public class VentaController {
     public String agregarProductoAlDetalle(@ModelAttribute("detalleVentaEntity") DetalleVentaEntity detalleVenta,
                                            HttpSession session, RedirectAttributes redirectAttributes) {
 
-        // Obtener la venta recién creada de la sesión
         VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
         List<DetalleVentaEntity> detallesTemporales = (List<DetalleVentaEntity>) session.getAttribute("detallesTemporales");
 
-        // Verificar si la venta existe en la sesión y si el usuario está autenticado
         if (ventaNueva == null || !session.getAttribute("ventaIniciada").equals(true)) {
-            // Redirigir a la creación de una nueva venta si no existe
             return "redirect:/venta/nueva-venta";
         }
 
-        // Buscar el producto por nombre
-        ProductoEntity productoEncontrado = productoRepository.findByNombre(detalleVenta.getProducto().getNombre());
+        try {
+            ventaService.agregarProductoAlDetalle(ventaNueva, detallesTemporales, detalleVenta);
+            return "redirect:/venta/detalle-venta";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/venta/detalle-venta";
+        }
+    }
 
-        if (productoEncontrado != null) {
-            // Verificar si hay suficiente stock para la cantidad ingresada
-            if (productoEncontrado.getInventario().getStock() >= detalleVenta.getCantidad()) {
-                // Remover el detalle existente para el mismo producto, si hay uno
-                detallesTemporales.removeIf(detalle -> Objects.equals(detalle.getProducto().getId(), productoEncontrado.getId()));
+    @PostMapping("detalle-venta/finalizar-venta")
+    public String finalizarVenta(HttpSession session, RedirectAttributes redirectAttributes) {
+        VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
+        List<DetalleVentaEntity> detallesTemporales = (List<DetalleVentaEntity>) session.getAttribute("detallesTemporales");
 
-                // Crear un nuevo detalle y agregarlo a la lista temporal
-                detalleVenta.setVenta(ventaNueva);
-                detalleVenta.setProducto(productoEncontrado);
-                detallesTemporales.add(detalleVenta);
-                System.out.println("----------");
-                for (DetalleVentaEntity detalle: detallesTemporales) {
-                    System.out.println(detalle.getVenta()+" "+ detalle.getProducto().getId()+" "+detalle.getCantidad());
-                }
-                System.out.println("----------");
+        if (ventaNueva == null || !session.getAttribute("ventaIniciada").equals(true)) {
+            return "redirect:/venta/nueva-venta";
+        }
 
-                // Redirigir a la página para agregar otro producto
-                return "redirect:/venta/detalle-venta";
-            } else {
-                // No hay suficiente stock, agregar mensaje de error y redirigir al formulario
-                redirectAttributes.addFlashAttribute("error", "No hay suficiente stock para el producto.");
-                return "redirect:/venta/detalle-venta";
-            }
-        } else {
-            // Producto no encontrado, agregar mensaje de error y redirigir al formulario
-            redirectAttributes.addFlashAttribute("error", "Producto no encontrado.");
+        try {
+            ventaService.finalizarVenta(ventaNueva, detallesTemporales);
+            detallesTemporales.clear();
+            session.removeAttribute("ventaNueva");
+            session.removeAttribute("ventaIniciada");
+            return "redirect:/aplicacion";
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/venta/detalle-venta";
         }
     }
@@ -173,7 +175,7 @@ public class VentaController {
             session.removeAttribute("ventaIniciada");
         }
 
-        return "redirect:/";
+        return "redirect:/aplicacion";
     }
 
     @GetMapping(value = "buscar-cliente/{dato}",produces = "application/json")
@@ -184,6 +186,92 @@ public class VentaController {
     @GetMapping(value = "buscar-producto/{nombre}",produces = "application/json")
     public @ResponseBody List<ProductoEntity> buscarProducto(@PathVariable String nombre){
         return productoService.buscarProductoPatron(nombre);
+    }
+
+    @GetMapping("lista-venta")
+    public String paginaLista(@RequestParam(name = "page",defaultValue = "0") int page,Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
+
+        if (usuarioEntity != null) {
+            model.addAttribute("usuarioEntity", usuarioEntity);
+        }
+        //Logica para mostar los productos
+        Pageable pagReq = PageRequest.of(page,5);
+        Page<VentaEntity> venta = ventaService.findAll(pagReq);
+        RenderPagina<VentaEntity> render = new RenderPagina<>("lista-venta",venta);
+        //Mandamos al front lo que queremos que se muestre
+        model.addAttribute("page",render);
+        //Y las entidades que debe mostrar
+        model.addAttribute("venta",venta);
+        //Ademas de un titulo de lo que se esta mostrando
+        model.addAttribute("operacion","Ventas Realizadas");
+        //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
+        return "venta/lista-venta";
+    }
+
+    @GetMapping("enviar-mail/{id}")
+    public String enviarMail(@PathVariable(name = "id") Integer id,Model model, RedirectAttributes redirectAttributes){
+
+        Optional<VentaEntity> venta = ventaRepository.findById(id);
+        List<DetalleVentaEntity> detalleVenta = detalleVentaRepository.findByVentaId(venta.get().getId());
+        if (venta.isPresent()){
+            String correo = venta.get().getCliente().getEmail();
+            gmail(venta.get(),detalleVenta);
+            redirectAttributes.addFlashAttribute("success","Correo enviado correctamente!");
+            return "redirect:/venta/lista-venta";
+        }else {
+            redirectAttributes.addFlashAttribute("error","No se encontro la venta");
+            return "redirect:/venta/lista-venta";
+        }
+    }
+
+    private void gmail(VentaEntity venta,List<DetalleVentaEntity> detalleVenta){
+        String gmail="haloemiliano93@gmail.com";
+        String pswd="ggej jmbg zqyw ckwp";
+        Properties p=System.getProperties();
+        p.setProperty("mail.smtps.host","smpt.gmail.com");
+        p.setProperty("mail.smtps.socketFactory.class","javax.net.ssl.SSLSocketFactory");
+        p.setProperty("mail.smtps.socketFactory.fallback","false");
+        p.setProperty("mail.smtp.port","465");
+        p.setProperty("mail.smtp.socketFactory.port","465");
+        p.setProperty("mail.smtps.auth","true");
+        p.setProperty("mail.smtp.ssl.trust","smtp.gmail.com");
+        p.setProperty("mail.smtps.ssl.trust","smtp.gmail.com");
+        p.setProperty("mail.smtp.ssl.quitwait","false");
+
+        //construcción del html
+        StringBuilder cuerpoCorreo = new StringBuilder();
+        cuerpoCorreo.append("<h2>¡Gracias por tu compra en Ones Sales!</h2>");
+        cuerpoCorreo.append("<p>Número de Ticket: ").append(venta.getId()).append("</p>");
+        cuerpoCorreo.append("<p>Nombre del Vendedor: ").append(venta.getUsuario().getNombre()).append("</p>");
+        cuerpoCorreo.append("<p>Fecha de Compra: ").append(new SimpleDateFormat("dd/MM/yyyy").format(venta.getFecha())).append("</p>");
+
+        // Lista de productos
+        cuerpoCorreo.append("<h3>Detalle de la Compra:</h3>");
+        cuerpoCorreo.append("<ul>");
+        for (DetalleVentaEntity detalle : detalleVenta) {
+            cuerpoCorreo.append("<li>").append(detalle.getProducto().getNombre()).append(" - Cantidad: ").append(detalle.getCantidad()).append("</li>");
+        }
+        cuerpoCorreo.append("</ul>");
+
+        // Total de la venta
+        cuerpoCorreo.append("<p>Total de la Compra: ").append(venta.getTotal()).append("</p>");
+        try{
+            Session session=Session.getInstance(p,null);
+            MimeMessage message=new MimeMessage(session);
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(venta.getCliente().getEmail(),false));
+            message.setSubject("Ticket de Compra");
+            message.setContent(cuerpoCorreo.toString(),"text/html");
+            message.setSentDate(new Date());
+            Transport transport=(Transport)session.getTransport("smtps");
+            transport.connect("smtp.gmail.com",gmail,pswd);
+            transport.sendMessage(message,message.getAllRecipients());
+            transport.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 }
