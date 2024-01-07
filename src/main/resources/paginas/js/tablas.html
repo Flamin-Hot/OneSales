@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="es">
+<body>
+<script th:fragment="jsTabla">
+  $(document).ready(function() {
+      $('#tablas').DataTable({
+        "paging": false,  // Desactiva la paginación
+        "info": false,    // Desactiva la información de "Mostrando X de Y entradas"
+        "columnDefs": [
+            { "orderable": false, "targets": 3 }
+        ]
+    });
+  });
+</script>
+<script th:fragment="jsTablaProducto">
+  $(document).ready(function() {
+      $('#tablas').DataTable({
+        "paging": false,  // Desactiva la paginación
+        "info": false,    // Desactiva la información de "Mostrando X de Y entradas"
+        "columnDefs": [
+            { "orderable": false, "targets": 5 }
+        ]
+    });
+  });
+</script>
+<script th:fragment="jsTablaCliente">
+  $(document).ready(function() {
+      $('#tablas').DataTable({
+        "paging": false,  // Desactiva la paginación
+        "info": false,    // Desactiva la información de "Mostrando X de Y entradas"
+        "columnDefs": [
+            { "orderable": false, "targets": 4 }
+        ]
+    });
+  });
+</script>
+<script th:fragment="jsTablaVenta">
+  $(document).ready(function() {
+      $('#tablas').DataTable({
+        "paging": false,  // Desactiva la paginación
+        "info": false,    // Desactiva la información de "Mostrando X de Y entradas"
+        "columnDefs": [
+            { "orderable": false, "targets": 5 }
+        ]
+    });
+  });
+</script>
+</body>
+</html>

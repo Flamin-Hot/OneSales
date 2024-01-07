@@ -6,6 +6,7 @@
     <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
     <link th:href="@{/tema/headers.css}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <!-- Header -->
@@ -85,13 +86,100 @@
 <!-- Main Content -->
 <main class="text-center">
     <h1>Bienvenido a One Sales</h1>
-    <img th:src="@{/imagen/poro.jpg}" width="600" height="300">
+
+    <hr>
+
+    <div class="card text-center" style="width: 80%; margin: auto;">
+        <h5 class="card-header" th:text="'Balance ' + ' - ' + ${#dates.format(venta.fecha, 'dd/MM/yyyy')}"></h5>
+        <div class="card-body">
+            <table th:if="${venta != null}"  class="table table-striped table-hover table-sm" style="margin-bottom: 20px;">
+                <tr>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Ventas Realizadas</th>
+                    <th scope="col">Total</th>
+                </tr>
+                <tbody>
+                    <td th:text="${venta.nombre}"></td>
+                    <td th:text="${venta.cantidad}"></td>
+                    <td th:text="${venta.total}"></td>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted">
+            <td th:text="${venta.fecha}"></td>
+        </div>
+    </div>
+
+    <hr>
+
+    <div style="width: 70%; margin: auto;">
+        <h1>DashBoard</h1>
+        <h2>Top 5 productos más vendidos</h2>
+        <canvas id="barChart"></canvas>
+        <div style="margin-bottom: 50px;"></div>
+        <h2 class="text-monospace">Top 3 productos menos vendidos</h2>
+        <canvas id="barChart2"></canvas>
+    </div>
+
+
 </main>
-    <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
-    <script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
-    <script th:src="@{/bootstrap/js/popper.min.js}"></script>
-    <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
-    <script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+<script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
+<script th:src="@{/bootstrap/js/popper.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script th:inline="javascript">
+    var ctx = document.getElementById('barChart').getContext('2d');
+    var labels = /*[[${labels}]]*/ [];
+    var cantidades = /*[[${cantidades}]]*/ [];
+
+    var barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: cantidades,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+<script th:inline="javascript">
+    var ctx = document.getElementById('barChart2').getContext('2d');
+    var labels = /*[[${labelsmenos}]]*/ [];
+    var cantidades = /*[[${cantidadesmenos}]]*/ [];
+
+    var barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: cantidades,
+                backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                borderColor: 'rgba(255, 0, 0, 1)',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>
 

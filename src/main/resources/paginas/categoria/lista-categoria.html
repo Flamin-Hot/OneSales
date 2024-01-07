@@ -7,11 +7,18 @@
     <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
     <link th:href="@{/tema/headers.css}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
     <style>
         .btn-disabled {
             pointer-events: none;
             cursor: not-allowed;
             opacity: 0.5;
+        }
+    </style>
+    <style>
+        .dataTables_wrapper {
+            width: 95%;
+            overflow: auto;
         }
     </style>
 </head>
@@ -93,41 +100,43 @@
 <!-- Main Content -->
 <main class="container d-flex flex-column align-items-center justify-content-center text-center">
     <div class="alert alert-success text-center" th:if="${success != null}" th:text="${success}"></div>
-    <h1 th:text="${operacion}"></h1>
-    <table th:if="${!categoria.isEmpty()}" class="table table-striped table-hover table-sm">
-        <thead class="table table-bordered">
-        <tr>
-            <th scope="col">Nombre</th>
-            <th scope="col">Descripción</th>
-            <th scope="col"># de Productos</th>
-            <th scope="col">Operaciones</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="ca: ${categoria}">
-            <td th:text="${ca.nombre}"></td>
-            <td th:text="${ca.descripcion}"></td>
-            <td th:text="${ca.getProductos().size()}"></td>
-            <td>
-                <a th:href="@{/categoria/modificar-categoria/{id} (id=${ca.id})}"
-                   class="btn btn-outline-success"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
-                    <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
-                </a>
+    <h1 th:text="${operacion}" style="margin-bottom: 20px;"></h1>
 
-                <a th:href="@{/categoria/borrar-categoria/{id} (id=${ca.id})}"
-                   class="btn btn-outline-danger"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
-                    <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
-                </a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        <table id="tablas" th:if="${!categoria.isEmpty()}" class="table table-striped table-hover table-sm" style="margin-bottom: 20px;">
+            <thead class="table table-bordered">
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Descripción</th>
+                <th scope="col"># de Productos</th>
+                <th scope="col">Operaciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ca: ${categoria}">
+                <td th:text="${ca.nombre}"></td>
+                <td th:text="${ca.descripcion}"></td>
+                <td th:text="${ca.getProductos().size()}"></td>
+                <td>
+                    <a th:href="@{/categoria/modificar-categoria/{id} (id=${ca.id})}"
+                       class="btn btn-outline-success"
+                       th:disabled="${!usuarioEntity.tipoUsuario}"
+                       th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                    >
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
+                    </a>
+
+                    <a th:href="@{/categoria/borrar-categoria/{id} (id=${ca.id})}"
+                       class="btn btn-outline-danger"
+                       th:disabled="${!usuarioEntity.tipoUsuario}"
+                       th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                    >
+                        <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
     <nav th:replace="plantillas/pag-nav:: paginador " class="mt-3 d-flex justify-content-center"></nav>
 </main>
 
@@ -135,6 +144,8 @@
 <script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
 <script th:src="@{/bootstrap/js/popper.min.js}"></script>
 <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
 <script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script th:replace="js/tablas :: jsTabla"></script>
 </body>
 </html>

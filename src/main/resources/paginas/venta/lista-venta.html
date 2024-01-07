@@ -8,6 +8,7 @@
     <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
     <link th:href="@{/tema/headers.css}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
     <style>
         .btn-outline-blue {
             color: #007bff;
@@ -17,6 +18,12 @@
             color: #fff;
             background-color: #007bff;
             border-color: #007bff;
+        }
+    </style>
+    <style>
+        .dataTables_wrapper {
+            width: 95%;
+            overflow: auto;
         }
     </style>
 </head>
@@ -97,14 +104,14 @@
 
 <!-- Main Content -->
 <main class="container d-flex flex-column align-items-center justify-content-center text-center">
-    <h1 th:text="${operacion}"></h1>
+    <h1 th:text="${operacion}" style="margin-bottom: 20px;"></h1>
     <div th:if="${error}" class="alert alert-danger">
         <p th:text="${error}"></p>
     </div>
     <div th:if="${success}" class="alert alert-success">
         <p th:text="${success}"></p>
     </div>
-    <table th:if="${!venta.isEmpty()}" class="table table-striped table-hover table-sm">
+    <table id="tablas" th:if="${!venta.isEmpty()}" class="table table-striped table-hover table-sm" style="margin-bottom: 20px;">
         <thead class="table table-bordered">
         <tr>
             <th scope="col">Ticket</th>
@@ -126,6 +133,29 @@
                 <a th:href="@{/venta/detalle-venta/{id} (id=${ve.id})}" class="btn btn-outline-success">
                     <i class="fas fa-table" aria-hidden="true"></i> Detalle
                 </a>
+                <div class="modal fade" id="detalleModal" tabindex="-1" role="dialog" aria-labelledby="detalleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="detalleModalLabel">Detalle de la Venta</h5>
+                            </div>
+                            <div class="modal-body">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>Nombre del Producto</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <a th:href="@{/venta/enviar-mail/{id} (id=${ve.id})}" class="btn btn-outline-blue">
                     <i class="fas fa-envelope" aria-hidden="true"></i> Enviar
                 </a>
@@ -141,5 +171,28 @@
 <script th:src="@{/bootstrap/js/popper.min.js}"></script>
 <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
 <script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script th:replace="js/tablas :: jsTablaVenta"></script>
+<script>
+    $(document).ready(function() {
+     $('.btn-outline-success').click(function(e) {
+         e.preventDefault();
+         var url = $(this).attr('href');
+         $.get(url, function(data) {
+             if (data) {
+                 var tableBody = '';
+                 data.forEach(function(detalle) {
+                     tableBody += '<tr><td>' + detalle.producto.nombre + '</td><td>' + detalle.cantidad + '</td><td>' + detalle.producto.precio + '</td></tr>';
+                 });
+                 $('#detalleModal .modal-body table tbody').html(tableBody);
+                 $('#detalleModal').modal('show');
+             } else {
+                 // Maneja el error aquí
+                 alert('Venta no encontrada');
+             }
+         });
+     });
+ });
+</script>
 </body>
 </html>

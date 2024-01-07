@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 @Controller
@@ -57,7 +60,7 @@ public class VentaController {
         VentaEntity venta = new VentaEntity();
         venta.setUsuario(usuarioEntity);
         venta.setTotal(0.0);
-        venta.setFecha(new Date());
+        venta.setFecha(java.sql.Date.valueOf(LocalDate.now()));
 
         session.setAttribute("venta", venta);
 
@@ -144,7 +147,7 @@ public class VentaController {
             detallesTemporales.clear();
             session.removeAttribute("ventaNueva");
             session.removeAttribute("ventaIniciada");
-            return "redirect:/aplicacion";
+            return "redirect:/venta/lista-venta";
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/venta/detalle-venta";
@@ -210,6 +213,16 @@ public class VentaController {
         return "venta/lista-venta";
     }
 
+    @GetMapping("detalle-venta/{id}")
+    public ResponseEntity<?> showDetalleVenta(@PathVariable("id") Integer id) {
+        List<DetalleVentaEntity> detalleVenta = detalleVentaRepository.findByVentaId(id);
+        if (detalleVenta != null) {
+            return new ResponseEntity<>(detalleVenta, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Venta no encontrada", HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("enviar-mail/{id}")
     public String enviarMail(@PathVariable(name = "id") Integer id,Model model, RedirectAttributes redirectAttributes){
 
@@ -257,6 +270,7 @@ public class VentaController {
 
         // Total de la venta
         cuerpoCorreo.append("<p>Total de la Compra: ").append(venta.getTotal()).append("</p>");
+
         try{
             Session session=Session.getInstance(p,null);
             MimeMessage message=new MimeMessage(session);
