@@ -51,19 +51,18 @@ public class VentaController {
     @Autowired
     DetalleVentaRepository detalleVentaRepository;
 
+    @Autowired
+    MetodoPagoRepository metodoPagoRepository;
+
 
     @GetMapping("nueva-venta")
     public String nuevaVenta(Model model, HttpSession session){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
 
-        VentaEntity venta = new VentaEntity();
-        venta.setUsuario(usuarioEntity);
-        venta.setTotal(0.0);
-        venta.setFecha(java.sql.Date.valueOf(LocalDate.now()));
+        VentaEntity venta = ventaService.iniciarNuevaVenta(usuarioEntity);
 
         session.setAttribute("venta", venta);
-
         model.addAttribute("usuarioEntity", usuarioEntity);
         model.addAttribute("ventaEntity",venta);
 
@@ -89,6 +88,7 @@ public class VentaController {
             return "redirect:/venta/nueva-venta";
         }
 
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
         if (usuarioEntity != null) {
@@ -106,9 +106,11 @@ public class VentaController {
         ProductoEntity producto = new ProductoEntity();
         detalleVenta.setProducto(producto);
 
+        List<MetodoPagoEntity> metodos = metodoPagoRepository.findAll();
+
+        model.addAttribute("selectMetodo",metodos);
         model.addAttribute("detalleVentaEntity", detalleVenta);
         model.addAttribute("detallesTemporales", detallesTemporales);
-
 
         return "venta/detalle-venta";
     }
@@ -134,7 +136,7 @@ public class VentaController {
     }
 
     @PostMapping("detalle-venta/finalizar-venta")
-    public String finalizarVenta(HttpSession session, RedirectAttributes redirectAttributes) {
+    public String finalizarVenta(@RequestParam("idMetodo") Integer idMetodo,HttpSession session, RedirectAttributes redirectAttributes) {
         VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
         List<DetalleVentaEntity> detallesTemporales = (List<DetalleVentaEntity>) session.getAttribute("detallesTemporales");
 
@@ -143,7 +145,7 @@ public class VentaController {
         }
 
         try {
-            ventaService.finalizarVenta(ventaNueva, detallesTemporales);
+            ventaService.finalizarVenta(ventaNueva, detallesTemporales,idMetodo);
             detallesTemporales.clear();
             session.removeAttribute("ventaNueva");
             session.removeAttribute("ventaIniciada");

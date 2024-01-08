@@ -22,4 +22,7 @@ public class VentaEntity {
     private ClienteEntity cliente;
     private Date fecha;
     private Double total;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_metodo")
+    private MetodoPagoEntity metodoPago;
 }

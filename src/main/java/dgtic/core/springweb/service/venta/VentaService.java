@@ -2,6 +2,7 @@ package dgtic.core.springweb.service.venta;
 
 import dgtic.core.springweb.model.DetalleVentaEntity;
 import dgtic.core.springweb.model.ProductoEntity;
+import dgtic.core.springweb.model.UsuarioEntity;
 import dgtic.core.springweb.model.VentaEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,8 @@ public interface VentaService {
     VentaEntity obtenerVentaPorId(Integer id);
     VentaEntity nuevaVenta(VentaEntity venta);
     void eliminarVenta(Integer id);
-    void finalizarVenta(VentaEntity ventaNueva, List<DetalleVentaEntity> detallesTemporales);
+    void finalizarVenta(VentaEntity ventaNueva, List<DetalleVentaEntity> detallesTemporales,Integer idVenta);
     void agregarProductoAlDetalle(VentaEntity ventaNueva, List<DetalleVentaEntity> detallesTemporales, DetalleVentaEntity nuevoDetalle);
     Page<VentaEntity> findAll(Pageable pageable);
+    VentaEntity iniciarNuevaVenta(UsuarioEntity usuario);
 }

@@ -143,7 +143,7 @@
                     <td th:text="${detalle.producto.nombre}"></td>
                     <td th:text="${detalle.cantidad}"></td>
                     <td th:text="${detalle.producto.precio}"></td>
-                    <td th:text="${detalle.cantidad * detalle.producto.precio}"></td>
+                    <td style="width: 250px;" th:text="${detalle.cantidad * detalle.producto.precio}"></td>
                     <td>
                         <form th:action="@{/venta/detalle-venta/eliminar-detalle}" method="post">
                             <input type="hidden" name="detalleIndex" th:value="${detalleIndex.index}" />
@@ -155,19 +155,29 @@
                 </tr>
                 </tbody>
                 <tfoot>
-                <tr>
-                    <td colspan="2"></td>
-                    <td><strong>Total Venta:</strong></td>
-                    <td>
-                        <span th:text="${#aggregates.sum(detallesTemporales.![cantidad * producto.precio])}"></span>
-                    </td>
-                </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td><strong>Total Venta:</strong></td>
+                        <td>
+                            <span th:text="${#aggregates.sum(detallesTemporales.![cantidad * producto.precio])}"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td><strong>Metodo Pago:</strong></td>
+                        <td>
+                            <select style="text-align: center;" class="form-control" id="metodoPago" name="metodoPago" required="required">
+                                <option th:each="sel : ${selectMetodo}" th:value="${sel.id}" th:text="${sel.metodo}"/>
+                            </select>
+                        </td>
+                    </tr>
                 </tfoot>
             </table>
         </div>
         <div class="card-footer">
             <form th:action="@{/venta/detalle-venta/finalizar-venta}" method="post">
                 <button class="btn btn-success" type="submit">Finalizar Venta</button>
+                <input type="hidden" id="idMetodoHidden" name="idMetodo" />
             </form>
         </div>
     </div>
@@ -179,5 +189,6 @@
 <script th:src="@{/bootstrap/js/jquery-ui.min.js}"></script>
 <script th:replace="venta/autocompletar :: jsproducto"></script>
 <script th:replace="venta/autocompletar :: jseliminarventa"></script>
+<script th:replace="venta/autocompletar :: jsIdMetodo"></script>
 </body>
 </html>

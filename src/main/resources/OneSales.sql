@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS inventario;
 DROP TABLE IF EXISTS categoria;
 DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS usuario;
+DROP TABLE IF EXISTS metodo_pago;
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -37,6 +38,11 @@ CREATE TABLE categoria (
     descripcion VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE metodo_pago(
+	id INT NOT NULL PRIMARY KEY,
+    metodo VARCHAR(20) NOT NULL UNIQUE
+);
+
 CREATE TABLE producto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
@@ -54,8 +60,10 @@ CREATE TABLE venta (
     id_cliente INT NOT NULL,
     fecha DATE NOT NULL,
     total DOUBLE NOT NULL,
+    id_metodo INT,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id),
-    FOREIGN KEY (id_cliente) REFERENCES cliente(id)
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id),
+    FOREIGN KEY (id_metodo) REFERENCES metodo_pago(id)
 );
 
 CREATE TABLE detalle_venta (
@@ -68,9 +76,7 @@ CREATE TABLE detalle_venta (
 );
 
 
--- Datos de Usuario, Cliente, Categorias, Productos, Inventarios, Ventas y Detalles Ventas
-INSERT INTO usuario (nombre,apellido,email,contrasena,tipo_usuario) VALUES ("Emiliano","Miranda","emiliano@mail.com","123",TRUE);
-INSERT INTO usuario (nombre,apellido,email,contrasena,tipo_usuario) VALUES ("Usuario","Usuario","usuario@mail.com","456",FALSE);
+-- Cliente, Categorias, Productos, Inventarios, Ventas y Detalles Ventas
 
 INSERT INTO cliente (nombre,apellido,email,telefono) VALUES ("Jhon","Doe","jhondoe@mail.com","5512435687");
 INSERT INTO cliente (nombre,apellido,email,telefono) VALUES ("Jan","Doe","jandoe@mail.com","5521346578");
@@ -80,6 +86,10 @@ INSERT INTO categoria (nombre, descripcion) VALUES ('Ropa', 'Prendas de vestir p
 INSERT INTO categoria (nombre, descripcion) VALUES ('Hogar', 'Artículos para el hogar');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Deportes', 'Artículos deportivos y equipos');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Juguetes', 'Juguetes y juegos para niños');
+
+INSERT INTO metodo_pago(id,metodo) VALUES (1,"EFECTIVO");
+INSERT INTO metodo_pago(id,metodo) VALUES (2,"TARJETA BANCARIA");
+INSERT INTO metodo_pago(id,metodo) VALUES (3,"TRANSFERENCIA");
 
 INSERT INTO inventario (stock) VALUES (100);
 INSERT INTO inventario (stock) VALUES (50);

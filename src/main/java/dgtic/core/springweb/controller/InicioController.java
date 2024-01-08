@@ -63,16 +63,20 @@ public class InicioController {
             BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), venta.size(), total, fechaActual);
             model.addAttribute("venta", balance);
 
-            // Mostramos el Dashboard
-            List<ProductoCantidadDTO> pc = detalleVentaRepository.obtenerTopProductos();
-            List<ProductoCantidadDTO> primeros5 = pc.subList(0, Math.min(5, pc.size()));
-            List<ProductoCantidadDTO> ultimos5 = pc.subList(Math.max(0, pc.size() - 5), pc.size());
-
-            model.addAttribute("labels", primeros5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
-            model.addAttribute("cantidades", primeros5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
-            model.addAttribute("labelsmenos", ultimos5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
-            model.addAttribute("cantidadesmenos", ultimos5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
+        } else {
+            BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(),0,0.0,fechaActual);
+            model.addAttribute("venta", balance);
         }
+
+        // Mostramos el Dashboard
+        List<ProductoCantidadDTO> pc = detalleVentaRepository.obtenerTopProductos();
+        List<ProductoCantidadDTO> primeros5 = pc.subList(0, Math.min(5, pc.size()));
+        List<ProductoCantidadDTO> ultimos5 = pc.subList(Math.max(0, pc.size() - 5), pc.size());
+
+        model.addAttribute("labels", primeros5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
+        model.addAttribute("cantidades", primeros5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
+        model.addAttribute("labelsmenos", ultimos5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
+        model.addAttribute("cantidadesmenos", ultimos5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
 
         return "aplicacion";
     }

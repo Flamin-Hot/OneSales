@@ -78,5 +78,11 @@
       });
   });
 </script>
+<script th:fragment="jsIdMetodo">
+  $('#metodoPago').change(function() {
+      var selectedId = $(this).val();
+      $('#idMetodoHidden').val(selectedId);
+  });
+</script>
 </body>
 </html>

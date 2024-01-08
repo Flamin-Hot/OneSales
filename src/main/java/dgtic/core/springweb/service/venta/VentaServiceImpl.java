@@ -2,8 +2,10 @@ package dgtic.core.springweb.service.venta;
 
 import dgtic.core.springweb.model.DetalleVentaEntity;
 import dgtic.core.springweb.model.ProductoEntity;
+import dgtic.core.springweb.model.UsuarioEntity;
 import dgtic.core.springweb.model.VentaEntity;
 import dgtic.core.springweb.repository.DetalleVentaRepository;
+import dgtic.core.springweb.repository.MetodoPagoRepository;
 import dgtic.core.springweb.repository.ProductoRepository;
 import dgtic.core.springweb.repository.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,6 +29,9 @@ public class VentaServiceImpl implements VentaService{
 
     @Autowired
     ProductoRepository productoRepository;
+
+    @Autowired
+    MetodoPagoRepository metodoPagoRepository;
 
     @Override
     public VentaEntity obtenerVentaPorId(Integer id) {
@@ -48,25 +54,30 @@ public class VentaServiceImpl implements VentaService{
     }
 
     @Override
-    public void finalizarVenta(VentaEntity ventaNueva, List<DetalleVentaEntity> detallesTemporales) {
-        if (!detallesTemporales.isEmpty()) {
-            Double totalVenta = 0.0;
-            for (DetalleVentaEntity detalle : detallesTemporales) {
-                DetalleVentaEntity detalleVenta = detalleVentaRepository.save(detalle);
-                if (detalleVenta != null) {
-                    Optional<ProductoEntity> producto = productoRepository.findById(detalleVenta.getProducto().getId());
-                    if (producto.isPresent()) {
-                        producto.get().getInventario().setStock(
-                                producto.get().getInventario().getStock() - detalle.getCantidad());
-                        productoRepository.save(producto.get());
+    public void finalizarVenta(VentaEntity ventaNueva, List<DetalleVentaEntity> detallesTemporales,Integer idVenta) {
+        if (idVenta!=null){
+            if (!detallesTemporales.isEmpty()) {
+                Double totalVenta = 0.0;
+                for (DetalleVentaEntity detalle : detallesTemporales) {
+                    DetalleVentaEntity detalleVenta = detalleVentaRepository.save(detalle);
+                    if (detalleVenta != null) {
+                        Optional<ProductoEntity> producto = productoRepository.findById(detalleVenta.getProducto().getId());
+                        if (producto.isPresent()) {
+                            producto.get().getInventario().setStock(
+                                    producto.get().getInventario().getStock() - detalle.getCantidad());
+                            productoRepository.save(producto.get());
+                        }
                     }
+                    totalVenta += detalle.getProducto().getPrecio() * detalle.getCantidad();
                 }
-                totalVenta += detalle.getProducto().getPrecio() * detalle.getCantidad();
+                ventaNueva.setTotal(totalVenta);
+                ventaNueva.setMetodoPago(metodoPagoRepository.findById(idVenta).get());
+                ventaRepository.save(ventaNueva);
+            } else {
+                throw new IllegalStateException("La lista de productos está vacía.");
             }
-            ventaNueva.setTotal(totalVenta);
-            ventaRepository.save(ventaNueva);
-        } else {
-            throw new IllegalStateException("La lista de productos está vacía.");
+        }else {
+            throw new IllegalStateException("No existe ese metodo de pago.");
         }
     }
 
@@ -91,5 +102,14 @@ public class VentaServiceImpl implements VentaService{
     @Override
     public Page<VentaEntity> findAll(Pageable pageable) {
         return ventaRepository.findAll(pageable);
+    }
+
+    @Override
+    public VentaEntity iniciarNuevaVenta(UsuarioEntity usuario) {
+        VentaEntity venta = new VentaEntity();
+        venta.setUsuario(usuario);
+        venta.setTotal(0.0);
+        venta.setFecha(java.sql.Date.valueOf(LocalDate.now()));
+        return venta;
     }
 }
