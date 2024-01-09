@@ -45,4 +45,9 @@ class SpringWebApplicationTests {
 
 		System.out.println(ventaRepository.findAllVentaByUsuarioIdAndFecha(6, fechaSql));
 	}
+
+	@Test
+	void z(){
+		System.out.println(ventaRepository.obtenerFechaTotal());
+	}
 }

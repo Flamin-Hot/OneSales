@@ -143,7 +143,7 @@
                     <td th:text="${detalle.producto.nombre}"></td>
                     <td th:text="${detalle.cantidad}"></td>
                     <td th:text="${detalle.producto.precio}"></td>
-                    <td style="width: 250px;" th:text="${detalle.cantidad * detalle.producto.precio}"></td>
+                    <td style="width: 250px;" th:text="${#numbers.formatDecimal(detalle.cantidad * detalle.producto.precio, 1, 2, 'POINT')}"></td>
                     <td>
                         <form th:action="@{/venta/detalle-venta/eliminar-detalle}" method="post">
                             <input type="hidden" name="detalleIndex" th:value="${detalleIndex.index}" />

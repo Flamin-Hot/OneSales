@@ -136,13 +136,15 @@ public class VentaController {
     }
 
     @PostMapping("detalle-venta/finalizar-venta")
-    public String finalizarVenta(@RequestParam("idMetodo") Integer idMetodo,HttpSession session, RedirectAttributes redirectAttributes) {
+    public String finalizarVenta(@RequestParam(name = "idMetodo",required = false) Integer idMetodo,HttpSession session, RedirectAttributes redirectAttributes) {
         VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
         List<DetalleVentaEntity> detallesTemporales = (List<DetalleVentaEntity>) session.getAttribute("detallesTemporales");
 
         if (ventaNueva == null || !session.getAttribute("ventaIniciada").equals(true)) {
             return "redirect:/venta/nueva-venta";
         }
+
+        idMetodo = (idMetodo == null) ? 1 : idMetodo;
 
         try {
             ventaService.finalizarVenta(ventaNueva, detallesTemporales,idMetodo);

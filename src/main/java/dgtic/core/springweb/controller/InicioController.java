@@ -1,14 +1,12 @@
 package dgtic.core.springweb.controller;
 
-import dgtic.core.springweb.model.BalanceDTO;
-import dgtic.core.springweb.model.ProductoCantidadDTO;
-import dgtic.core.springweb.model.UsuarioEntity;
-import dgtic.core.springweb.model.VentaEntity;
+import dgtic.core.springweb.model.*;
 import dgtic.core.springweb.repository.DetalleVentaRepository;
 import dgtic.core.springweb.repository.VentaRepository;
 import dgtic.core.springweb.service.usuario.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -44,7 +42,7 @@ public class InicioController {
     //Es es el controlador encargado de mostrar la pagina aplicacion
     //Es un get pues indicamos que debe mostrar la pagina y algunos atributos de la session
     @GetMapping("aplicacion")
-    public String aplicacion(Model model) {
+    public String aplicacion(@RequestParam(name = "fecha", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (authentication.getPrincipal() instanceof UsuarioEntity) ? (UsuarioEntity) authentication.getPrincipal() : null;
 
@@ -52,19 +50,21 @@ public class InicioController {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
 
-        // Mostramos el Balance
-        Date fechaActual = Date.valueOf(LocalDate.now());
-        List<VentaEntity> venta = (usuarioEntity != null) ? ventaRepository.findAllVentaByUsuarioIdAndFecha(usuarioEntity.getId(), fechaActual) : Collections.emptyList();
+        if (fecha == null) {
+            fecha = LocalDate.now();
+        }
+
+        List<VentaEntity> venta = (usuarioEntity != null) ? ventaRepository.findAllVentaByUsuarioIdAndFecha(usuarioEntity.getId(), Date.valueOf(fecha)) : Collections.emptyList();
 
         if (!venta.isEmpty()) {
             // Cálculo del total usando Streams
             Double total = venta.stream().mapToDouble(VentaEntity::getTotal).sum();
 
-            BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), venta.size(), total, fechaActual);
+            BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), venta.size(), total, Date.valueOf(fecha));
             model.addAttribute("venta", balance);
 
         } else {
-            BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(),0,0.0,fechaActual);
+            BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), 0, 0.0, Date.valueOf(fecha));
             model.addAttribute("venta", balance);
         }
 
@@ -72,11 +72,14 @@ public class InicioController {
         List<ProductoCantidadDTO> pc = detalleVentaRepository.obtenerTopProductos();
         List<ProductoCantidadDTO> primeros5 = pc.subList(0, Math.min(5, pc.size()));
         List<ProductoCantidadDTO> ultimos5 = pc.subList(Math.max(0, pc.size() - 5), pc.size());
-
         model.addAttribute("labels", primeros5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
         model.addAttribute("cantidades", primeros5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
         model.addAttribute("labelsmenos", ultimos5.stream().map(ProductoCantidadDTO::getNombre).collect(Collectors.toList()));
         model.addAttribute("cantidadesmenos", ultimos5.stream().map(ProductoCantidadDTO::getCantidad).collect(Collectors.toList()));
+
+        List<FechaTotalDTO> ft = ventaRepository.obtenerFechaTotal();
+        model.addAttribute("fechas", ft.stream().map(FechaTotalDTO::getFecha).collect(Collectors.toList()));
+        model.addAttribute("totales", ft.stream().map(FechaTotalDTO::getTotal).collect(Collectors.toList()));
 
         return "aplicacion";
     }
