@@ -33,4 +33,8 @@ public class ClienteEntity {
     @NotBlank
     @Size(min = 10,max = 10)
     private String telefono;
+
+    @NotBlank
+    @Size(min = 10,max = 13)
+    private String rfc;
 }

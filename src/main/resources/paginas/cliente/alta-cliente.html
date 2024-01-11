@@ -141,7 +141,18 @@
                             <small th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="text-danger"></small>
                         </div>
                     </div>
-                    <div class="col-md-3 mx-auto mt-3">
+                    <div class="col-md-5 mx-auto">
+                        <div class="form-group">
+                            <label for="rfc" class="align-middle">RFC</label>
+                            <input type="text" class="form-control text-center"
+                                   id="rfc" name="rfc"
+                                   th:field="*{rfc}"
+                                   placeholder="RFC del Cliente"
+                                   required="true">
+                            <small th:if="${#fields.hasErrors('rfc')}" th:errors="*{rfc}" class="text-danger"></small>
+                        </div>
+                    </div>
+                    <div class="col-md-5 mx-auto mt-3">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </div>

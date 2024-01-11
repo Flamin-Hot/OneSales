@@ -99,9 +99,9 @@
                     <th scope="col" width="250">Total</th>
                 </tr>
                 <tbody>
-                <td th:text="${venta.nombre}" width="250"></td>
+                <td th:text="*{venta.nombre}" width="250"></td>
                 <td th:text="${venta.cantidad}" width="250"></td>
-                <td th:text="${#numbers.formatDecimal(venta.total, 1, 2,'POINT')}" width="250"></td>
+                <td th:text="${venta.total}" width="250"></td>
                 </tbody>
             </table>
         </div>

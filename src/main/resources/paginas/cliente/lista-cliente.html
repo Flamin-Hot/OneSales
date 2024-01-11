@@ -107,6 +107,7 @@
             <th scope="col">Apellido</th>
             <th scope="col">Email</th>
             <th scope="col">Teléfono</th>
+            <th scope="col">RFC</th>
             <th scope="col">Operaciones</th>
         </tr>
         </thead>
@@ -116,6 +117,7 @@
             <td th:text="${cl.apellido}"></td>
             <td th:text="${cl.email}"></td>
             <td th:text="${cl.telefono}"></td>
+            <td th:text="${cl.rfc}"></td>
             <td>
                 <a th:href="@{/cliente/modificar-cliente/{id} (id=${cl.id})}"
                    class="btn btn-outline-success"

@@ -70,6 +70,7 @@ public class VentaServiceImpl implements VentaService{
                     }
                     totalVenta += detalle.getProducto().getPrecio() * detalle.getCantidad();
                 }
+                totalVenta = Math.round(totalVenta * 100.0) / 100.0;
                 ventaNueva.setTotal(totalVenta);
                 ventaNueva.setMetodoPago(metodoPagoRepository.findById(idVenta).get());
                 ventaRepository.save(ventaNueva);

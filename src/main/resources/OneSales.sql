@@ -1,14 +1,16 @@
 CREATE SCHEMA IF NOT EXISTS sales;
 USE sales;
 
+DROP TABLE IF EXISTS factura;
 DROP TABLE IF EXISTS detalle_venta;
 DROP TABLE IF EXISTS venta;
 DROP TABLE IF EXISTS producto;
-DROP TABLE IF EXISTS inventario;
+DROP TABLE IF EXISTS metodo_pago;
 DROP TABLE IF EXISTS categoria;
+DROP TABLE IF EXISTS inventario;
 DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS usuario;
-DROP TABLE IF EXISTS metodo_pago;
+
 
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -24,7 +26,8 @@ CREATE TABLE cliente (
     nombre VARCHAR(50) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
     email VARCHAR(50) NOT NULL UNIQUE,
-    telefono VARCHAR(10) NOT NULL UNIQUE
+    telefono VARCHAR(10) NOT NULL UNIQUE,
+    rfc VARCHAR(13) NOT NULL UNIQUE
 );
 
 CREATE TABLE inventario (
@@ -75,11 +78,21 @@ CREATE TABLE detalle_venta (
     FOREIGN KEY (id_producto) REFERENCES producto(id)
 );
 
+CREATE TABLE factura(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT NOT NULL,
+    id_venta INT NOT NULL,
+    fecha DATE NOT NULL,
+    clave_hash VARCHAR(256) NOT NULL UNIQUE,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id),
+    FOREIGN KEY (id_venta) REFERENCES venta(id)
+);
+
+
 
 -- Cliente, Categorias, Productos, Inventarios, Ventas y Detalles Ventas
-
-INSERT INTO cliente (nombre,apellido,email,telefono) VALUES ("Jhon","Doe","jhondoe@mail.com","5512435687");
-INSERT INTO cliente (nombre,apellido,email,telefono) VALUES ("Jan","Doe","jandoe@mail.com","5521346578");
+INSERT INTO cliente (nombre,apellido,email,telefono,rfc) VALUES ("Jhon","Doe","jhondoe@mail.com","5512435687","XXXXXXXXXX");
+INSERT INTO cliente (nombre,apellido,email,telefono,rfc) VALUES ("Jan","Doe","jandoe@mail.com","5521346578","YYYYYYYYYYYYY");
 
 INSERT INTO categoria (nombre, descripcion) VALUES ('Electrónica', 'Productos electrónicos de última generación');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Ropa', 'Prendas de vestir para todas las edades');
