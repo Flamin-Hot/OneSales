@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Alta Categoría</title>
+    <title>Facturas</title>
     <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
     <link th:href="@{/tema/headers.css}" rel="stylesheet">
@@ -100,42 +100,42 @@
     <div th:if="${warning}" class="alert alert-danger">
         <p th:text="${warning}"></p>
     </div>
+    <div th:if="${success}" class="alert alert-success">
+        <p th:text="${success}"></p>
+    </div>
 
     <!-- Formulario -->
     <div class="card mx-auto" style="width: 85%;">
-        <h4 class="card-header text-center"><strong>Registrar Categoría</strong></h4>
+        <h4 class="card-header text-center"><strong>Generar Factura</strong></h4>
         <div class="card-body">
-            <!-- con el action indicamos que al presionar guardar spring debe encontrar un controlador
-            que maneje dicha solicitud. La solicitud es un post porque el action intenta guardar una categoría en la base de datos-->
-            <form th:action="@{/categoria/formulario}" th:object="${categoriaEntity}" method="post">
+            <form th:action="@{/factura/nueva-factura}" th:object="${facturaEntity}" method="post">
                 <div class="row">
                     <div class="col-md-5 mx-auto">
                         <div class="form-group">
-                            <label for="nombre" class="align-middle">Nombre</label>
+                            <label for="email" class="align-middle">Correo Cliente</label>
                             <input type="text" class="form-control text-center"
-                                   id="nombre" name="nombre"
-                                   th:field="*{nombre}"
-                                   placeholder="Nombre de la Categoría"
+                                   id="email" name="email"
+                                   th:field="*{cliente.email}"
+                                   placeholder="Correo electronico del Cliente"
                                    required="true">
-                            <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></small>
+                            <small th:if="${#fields.hasErrors('cliente.email')}" th:errors="*{cliente.email}" class="text-danger"></small>
                         </div>
                     </div>
                     <div class="col-md-5 mx-auto">
                         <div class="form-group">
-                            <label for="descripcion" class="align-middle">Descripción</label>
+                            <label for="ticket" class="align-middle">Número de Ticket</label>
                             <input type="text" class="form-control text-center"
-                                   id="descripcion" name="descripcion"
-                                   th:field="*{descripcion}"
-                                   placeholder="Descripción de la Categoría"
+                                   id="ticket" name="ticket"
+                                   th:field="*{venta.id}"
+                                   placeholder="Número de Ticket"
                                    required="true">
-                            <small th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-danger"></small>
+                            <small th:if="${#fields.hasErrors('venta.id')}" th:errors="*{venta.id}" class="text-danger"></small>
                         </div>
                     </div>
                     <div class="col-md-3 mx-auto mt-3">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="submit" class="btn btn-primary">Generar</button>
                     </div>
                 </div>
-                <input type="hidden" name="id" th:field="*{id}"/>
             </form>
         </div>
     </div>

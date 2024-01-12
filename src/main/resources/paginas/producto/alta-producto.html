@@ -72,6 +72,17 @@
             </li>
           </ul>
         </div>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown5">
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink5" role="button" data-bs-toggle="dropdown" aria-expanded="false">Facturas</a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink3">
+                <li><a class="dropdown-item" th:href="@{/factura/alta-factura}">Alta Factura</a></li>
+                <li><a class="dropdown-item" th:href="@{/factura/lista-factura}">Lista Facturas</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
         <!-- Botón de cierre de sesión -->
         <div class="d-flex">
           <form th:action="@{/logout}" method="post">

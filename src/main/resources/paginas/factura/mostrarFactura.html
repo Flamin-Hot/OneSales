@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura Generada</title>
+</head>
+<body>
+<h1>Factura Generada</h1>
+<object th:data="'/factura/mostrar/' + ${nombreArchivo}" type="application/pdf" width="100%" height="600px">
+    <p>No se puede mostrar el PDF. <a th:href="'/factura/mostrar/' + ${nombreArchivo}">Descargar</a></p>
+</object>
+<p>Hash de la factura: ${nombreArchivo}</p>
+</body>
+</html>

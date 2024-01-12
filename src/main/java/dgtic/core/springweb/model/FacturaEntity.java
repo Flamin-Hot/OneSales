@@ -14,7 +14,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "factura")
 public class FacturaEntity {
@@ -23,11 +22,15 @@ public class FacturaEntity {
     private Integer id;
 
     @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private UsuarioEntity usuario;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_cliente")
     @Valid
     private ClienteEntity cliente;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_venta")
     @Valid
     private VentaEntity venta;
@@ -57,7 +60,8 @@ public class FacturaEntity {
         return hexString.toString();
     }
 
-    public FacturaEntity(ClienteEntity cliente,VentaEntity venta,Date fecha) throws NoSuchAlgorithmException {
+    public FacturaEntity(UsuarioEntity usuario,ClienteEntity cliente,VentaEntity venta,Date fecha) throws NoSuchAlgorithmException {
+        this.usuario = usuario;
         this.cliente = cliente;
         this.venta = venta;
         this.fecha = fecha;

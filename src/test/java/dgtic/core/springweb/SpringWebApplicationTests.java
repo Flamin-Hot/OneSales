@@ -2,11 +2,9 @@ package dgtic.core.springweb;
 
 import dgtic.core.springweb.model.FacturaEntity;
 import dgtic.core.springweb.model.ProductoCantidadDTO;
+import dgtic.core.springweb.model.UsuarioEntity;
 import dgtic.core.springweb.model.VentaEntity;
-import dgtic.core.springweb.repository.ClienteRepository;
-import dgtic.core.springweb.repository.DetalleVentaRepository;
-import dgtic.core.springweb.repository.FacturaRepository;
-import dgtic.core.springweb.repository.VentaRepository;
+import dgtic.core.springweb.repository.*;
 import dgtic.core.springweb.service.factura.FacturaService;
 import dgtic.core.springweb.service.factura.FacturaServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,9 @@ class SpringWebApplicationTests {
 
 	@Autowired
 	ClienteRepository clienteRepository;
+
+	@Autowired
+	UsuarioRepository usuarioRepository;
 
 	@Autowired
 	VentaRepository ventaRepository;
@@ -75,7 +76,7 @@ class SpringWebApplicationTests {
 
 	@Test
 	void a() throws NoSuchAlgorithmException {
-		FacturaEntity factura = new FacturaEntity(clienteRepository.findById(3).get(),ventaRepository.findById(1).get(),Date.valueOf("2024-01-10"));
+		FacturaEntity factura = new FacturaEntity(usuarioRepository.findById(1).get(),clienteRepository.findById(3).get(),ventaRepository.findById(1).get(),Date.valueOf("2024-01-10"));
 		facturaService.generarFactura(facturaRepository.save(factura));
 	}
 }

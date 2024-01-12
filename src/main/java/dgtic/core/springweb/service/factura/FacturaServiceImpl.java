@@ -6,10 +6,8 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import dgtic.core.springweb.model.DetalleVentaEntity;
-import dgtic.core.springweb.model.FacturaEntity;
-import dgtic.core.springweb.repository.DetalleVentaRepository;
-import dgtic.core.springweb.repository.VentaRepository;
+import dgtic.core.springweb.model.*;
+import dgtic.core.springweb.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +15,52 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FacturaServiceImpl implements FacturaService{
 
+
+    @Autowired
+    FacturaRepository facturaRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
+    @Autowired
+    ClienteRepository clienteRepository;
     @Autowired
     VentaRepository ventaRepository;
     @Autowired
     DetalleVentaRepository detalleVentaRepository;
+
+
+    @Override
+    public FacturaEntity nuevaFactura(FacturaEntity factura) {
+        UsuarioEntity usuario = usuarioRepository.findById(factura.getUsuario().getId())
+                .orElseThrow(() -> new IllegalStateException("El usuario que quiere crear la factura no existe!"));
+
+        ClienteEntity cliente = clienteRepository.findClienteByEmail(factura.getCliente().getEmail());
+        if (cliente == null) {
+            throw new IllegalStateException("El cliente asociado a la factura no existe!");
+        }
+
+        VentaEntity venta = ventaRepository.findById(factura.getVenta().getId())
+                .orElseThrow(() -> new IllegalStateException("El número de ticket asociado a la factura no existe!"));
+
+        if (venta.getCliente().getId() != cliente.getId()) {
+            throw new IllegalStateException("El cliente asignado a la factura no es el cliente registrado en la venta!");
+        }
+
+        try {
+            FacturaEntity nuevaFactura = new FacturaEntity(usuario, cliente, venta, Date.valueOf(LocalDate.now()));
+            return facturaRepository.save(nuevaFactura);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Hubo un error al generar la factura!");
+        }
+    }
 
 
     @Override
