@@ -80,10 +80,12 @@ CREATE TABLE detalle_venta (
 
 CREATE TABLE factura(
 	id INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT NOT NULL,
     id_cliente INT NOT NULL,
     id_venta INT NOT NULL,
     fecha DATE NOT NULL,
     clave_hash VARCHAR(256) NOT NULL UNIQUE,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id),
     FOREIGN KEY (id_cliente) REFERENCES cliente(id),
     FOREIGN KEY (id_venta) REFERENCES venta(id)
 );

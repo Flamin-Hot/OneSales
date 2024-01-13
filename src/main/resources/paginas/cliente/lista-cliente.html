@@ -20,6 +20,7 @@
             overflow: auto;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
 </head>
 <body>
@@ -131,18 +132,12 @@
             <td th:text="${cl.rfc}"></td>
             <td>
                 <a th:href="@{/cliente/modificar-cliente/{id} (id=${cl.id})}"
-                   class="btn btn-outline-success"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
+                   class="btn btn-outline-success">
                     <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
                 </a>
 
                 <a th:href="@{/cliente/borrar-cliente/{id} (id=${cl.id})}"
-                   class="btn btn-outline-danger"
-                   th:disabled="${!usuarioEntity.tipoUsuario}"
-                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
-                >
+                   class="btn btn-outline-danger">
                     <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
                 </a>
             </td>

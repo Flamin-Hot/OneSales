@@ -50,11 +50,13 @@ public class SecurityConfig {
                                 .usernameParameter("username")
                                 .passwordParameter("password")
                                 .defaultSuccessUrl("/aplicacion", true)
+                                .failureUrl("/?error=true")
                                 .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .clearAuthentication(true)
+                        .invalidateHttpSession(true)
                         .permitAll());
 
         return httpSecurity.build();

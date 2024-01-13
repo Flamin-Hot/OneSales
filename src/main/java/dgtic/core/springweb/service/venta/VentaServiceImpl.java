@@ -1,9 +1,6 @@
 package dgtic.core.springweb.service.venta;
 
-import dgtic.core.springweb.model.DetalleVentaEntity;
-import dgtic.core.springweb.model.ProductoEntity;
-import dgtic.core.springweb.model.UsuarioEntity;
-import dgtic.core.springweb.model.VentaEntity;
+import dgtic.core.springweb.model.*;
 import dgtic.core.springweb.repository.DetalleVentaRepository;
 import dgtic.core.springweb.repository.MetodoPagoRepository;
 import dgtic.core.springweb.repository.ProductoRepository;
@@ -13,10 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class VentaServiceImpl implements VentaService{
@@ -112,5 +111,16 @@ public class VentaServiceImpl implements VentaService{
         venta.setTotal(0.0);
         venta.setFecha(java.sql.Date.valueOf(LocalDate.now()));
         return venta;
+    }
+
+    @Override
+    public List<BalanceMetodoPagoDTO> obtenerBalanceMetodoPago(Date fecha,Integer id) {
+        List<Object[]> resultados = ventaRepository.obtenerDatosBalanceMetodoPago(fecha,id);
+        return resultados.stream()
+                .map(resultado -> new BalanceMetodoPagoDTO(
+                        (String) resultado[0],
+                        ((Number) resultado[1]).doubleValue(),
+                        ((Number) resultado[2]).longValue()))
+                .collect(Collectors.toList());
     }
 }

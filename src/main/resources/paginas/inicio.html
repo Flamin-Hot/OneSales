@@ -11,9 +11,11 @@
 </head>
 <body class="text-center">
 <main class="form-signin">
-    <div th:if="${warning}" class="alert alert-warning" role="alert">
-        <strong th:text="${warning}"></strong>
+
+    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        <p>Usuario o Contraseña incorrectos</p>
     </div>
+
     <!-- Indicamos que los campos del inicio de sesion deben ser gestionados por el controlador login-->
     <form th:action="@{/login}"method="post">
         <img class="mb-4" th:src="@{/imagen/logo.png}" alt="" width="80%" height="80%">

@@ -1,9 +1,6 @@
 package dgtic.core.springweb;
 
-import dgtic.core.springweb.model.FacturaEntity;
-import dgtic.core.springweb.model.ProductoCantidadDTO;
-import dgtic.core.springweb.model.UsuarioEntity;
-import dgtic.core.springweb.model.VentaEntity;
+import dgtic.core.springweb.model.*;
 import dgtic.core.springweb.repository.*;
 import dgtic.core.springweb.service.factura.FacturaService;
 import dgtic.core.springweb.service.factura.FacturaServiceImpl;
@@ -16,6 +13,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SpringBootTest
 class SpringWebApplicationTests {
@@ -78,5 +76,17 @@ class SpringWebApplicationTests {
 	void a() throws NoSuchAlgorithmException {
 		FacturaEntity factura = new FacturaEntity(usuarioRepository.findById(1).get(),clienteRepository.findById(3).get(),ventaRepository.findById(1).get(),Date.valueOf("2024-01-10"));
 		facturaService.generarFactura(facturaRepository.save(factura));
+	}
+
+	@Test
+	void b() {
+		List<Object[]> resultados = ventaRepository.obtenerDatosBalanceMetodoPago(Date.valueOf(LocalDate.now()),1);
+		List<BalanceMetodoPagoDTO> x = resultados.stream()
+				.map(resultado -> new BalanceMetodoPagoDTO(
+						(String) resultado[0],
+						((Number) resultado[1]).doubleValue(),
+						((Number) resultado[2]).longValue()))
+				.collect(Collectors.toList());
+		x.forEach(System.out::println);
 	}
 }

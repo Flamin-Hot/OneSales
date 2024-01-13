@@ -4,6 +4,7 @@ import dgtic.core.springweb.model.*;
 import dgtic.core.springweb.repository.DetalleVentaRepository;
 import dgtic.core.springweb.repository.VentaRepository;
 import dgtic.core.springweb.service.usuario.UsuarioService;
+import dgtic.core.springweb.service.venta.VentaService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,6 +32,8 @@ public class InicioController {
     @Autowired
     VentaRepository ventaRepository;
 
+    @Autowired
+    VentaService ventaService;
 
     //Cuando se despliega la aplicacion hacemos un get para obtener la pagina de inicio
     @GetMapping("")
@@ -55,17 +58,22 @@ public class InicioController {
         }
 
         List<VentaEntity> venta = (usuarioEntity != null) ? ventaRepository.findAllVentaByUsuarioIdAndFecha(usuarioEntity.getId(), Date.valueOf(fecha)) : Collections.emptyList();
+        List<BalanceMetodoPagoDTO> detalle = (usuarioEntity != null) ? ventaService.obtenerBalanceMetodoPago(Date.valueOf(fecha),usuarioEntity.getId()) : Collections.emptyList();
+
 
         if (!venta.isEmpty()) {
             // Cálculo del total usando Streams
             Double total = venta.stream().mapToDouble(VentaEntity::getTotal).sum();
 
             BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), venta.size(), total, Date.valueOf(fecha));
+            model.addAttribute("detalle", detalle);
             model.addAttribute("venta", balance);
 
         } else {
+            detalle.add(new BalanceMetodoPagoDTO(" ",0.0,0L));
             BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), 0, 0.0, Date.valueOf(fecha));
             model.addAttribute("venta", balance);
+            model.addAttribute("detalle", detalle);
         }
 
         // Mostramos el Dashboard
