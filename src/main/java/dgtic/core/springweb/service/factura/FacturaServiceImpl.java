@@ -9,6 +9,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import dgtic.core.springweb.model.*;
 import dgtic.core.springweb.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -36,6 +38,11 @@ public class FacturaServiceImpl implements FacturaService{
     @Autowired
     DetalleVentaRepository detalleVentaRepository;
 
+
+    @Override
+    public Page<FacturaEntity> findAll(Pageable pageable) {
+        return facturaRepository.findAll(pageable);
+    }
 
     @Override
     public FacturaEntity nuevaFactura(FacturaEntity factura) {
@@ -181,7 +188,7 @@ public class FacturaServiceImpl implements FacturaService{
                 tablaProducto.addCell(detalle.getProducto().getNombre());
                 tablaProducto.addCell(detalle.getProducto().getPrecio().toString());
                 tablaProducto.addCell(String.format("%.2f", detalle.getProducto().getPrecio() * .16));
-                tablaProducto.addCell(String.valueOf(detalle.getProducto().getPrecio()*detalle.getCantidad()));
+                tablaProducto.addCell(String.format("%.2f",detalle.getProducto().getPrecio()*detalle.getCantidad()));
             }
 
             //agregar al documento

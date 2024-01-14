@@ -77,7 +77,9 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink5" role="button" data-bs-toggle="dropdown" aria-expanded="false">Facturas</a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink3">
-                                <li><a class="dropdown-item" th:href="@{/factura/alta-factura}">Alta Factura</a></li>
+                                <li th:if="${usuarioEntity.tipoUsuario}">
+                                    <a class="dropdown-item" th:href="@{/factura/alta-factura}">Alta Factura</a>
+                                </li>
                                 <li><a class="dropdown-item" th:href="@{/factura/lista-factura}">Lista Facturas</a></li>
                             </ul>
                         </li>

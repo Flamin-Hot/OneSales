@@ -3,10 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Alta Producto</title>
+  <title>Facturas</title>
   <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
   <link th:href="@{/bootstrap/css/jquery-ui.min.css}" rel="stylesheet">
   <link th:href="@{/tema/headers.css}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+  <style>
+    .btn-outline-blue {
+        color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-outline-blue:hover {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+  </style>
+  <style>
+    .dataTables_wrapper {
+        width: 95%;
+        overflow: auto;
+    }
+  </style>
 </head>
 <body>
 <!-- Header -->
@@ -98,80 +117,34 @@
 
 <!-- Main Content -->
 <main class="container d-flex flex-column align-items-center justify-content-center text-center">
-  <!-- Error global -->
-  <div th:if="${warning}" class="alert alert-danger">
-    <p th:text="${warning}"></p>
-  </div>
-
-  <!-- Formulario -->
-  <div class="card mx-auto" style="width: 85%;">
-    <h4 class="card-header text-center"><strong>Registrar Producto</strong></h4>
-    <div class="card-body">
-      <!-- con el action indicamos que al presionar guardar spring debe encontrar un controlador
-      que maneje dicha solicitud. La solicitud es un post porque el action intenta guardar una categoría en la base de datos-->
-      <form th:action="@{/producto/formulario}" th:object="${productoEntity}" method="post">
-        <div class="row">
-          <div class="col-md-5 mx-auto">
-            <div class="form-group">
-              <label for="nombre" class="align-middle">Nombre</label>
-              <input type="text" class="form-control text-center"
-                     id="nombre" name="nombre"
-                     th:field="*{nombre}"
-                     placeholder="Nombre del Producto"
-                     required="true">
-              <small th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></small>
-            </div>
-          </div>
-          <div class="col-md-5 mx-auto">
-            <div class="form-group">
-              <label for="descripcion" class="align-middle">Descripción</label>
-              <input type="text" class="form-control text-center"
-                     id="descripcion" name="descripcion"
-                     th:field="*{descripcion}"
-                     placeholder="Descripción del Producto"
-                     required="true">
-              <small th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="text-danger"></small>
-            </div>
-          </div>
-          <div class="col-md-5 mx-auto">
-            <div class="form-group">
-              <label for="precio" class="align-middle">Precio</label>
-              <input type="text" class="form-control text-center"
-                     id="precio" name="precio" th:field="*{precio}"
-                     placeholder="Precio del Producto"
-                     required="true" pattern="[^\s]+"
-                     title="No se permiten espacios en blanco en el precio">
-              <small th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}" class="text-danger"></small>
-            </div>
-          </div>
-          <div class="col-md-5 mx-auto">
-            <div class="form-group">
-              <label for="inventario.stock" class="align-middle">Stock</label>
-              <input type="text" class="form-control text-center"
-                     id="inventario.stock" name="inventario.stock"
-                     th:field="*{inventario.stock}"
-                     placeholder="Stock del Producto"
-                     required="true">
-              <small th:if="${#fields.hasErrors('inventario.stock')}" th:errors="*{inventario.stock}" class="text-danger"></small>
-            </div>
-          </div>
-          <div class="col-md-5 mx-auto">
-            <div class="form-group">
-              <label for="categoria" class="align-middle">Categoría</label>
-              <select class="form-control" th:field="*{categoria.id}" id="categoria" name="categoria" required="requiered">
-                <option th:each="sel : ${selectCategoria}" th:value="${sel.id}" th:text="${sel.nombre}"/>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-5 mx-auto mt-3">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </div>
-        </div>
-        <input type="hidden" name="id" th:field="*{id}"/>
-        <input type="hidden" name="inventario" th:field="*{inventario.id}" />
-      </form>
-    </div>
-  </div>
+  <h1 th:text="${operacion}" style="margin-bottom: 20px;"></h1>
+  <table id="tablas" th:if="${!factura.isEmpty()}" class="table table-striped table-hover table-sm" style="margin-bottom: 20px;">
+    <thead class="table table-bordered">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Cliente</th>
+      <th scope="col">Ticket</th>
+      <th scope="col">Fecha</th>
+      <th scope="col">Documento</th>
+      <th scope="col">Operaciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="fa: ${factura}">
+      <td th:text="${fa.id}"></td>
+      <td th:text="${fa.cliente.email}"></td>
+      <td th:text="${fa.venta.id}"></td>
+      <td th:text="${#dates.format(fa.fecha, 'dd-MM-yyyy')}"></td>
+      <td th:text="${'Factura_'+fa.hash+'.pdf'}"></td>
+      <td>
+        <a th:href="@{/factura/enviar-factura/{id} (id=${fa.hash})}" class="btn btn-outline-blue">
+          <i class="fas fa-envelope" aria-hidden="true"></i> Enviar
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <nav th:replace="plantillas/pag-nav:: paginador " class="mt-3 d-flex justify-content-center"></nav>
 </main>
 
 <script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
@@ -179,5 +152,7 @@
 <script th:src="@{/bootstrap/js/popper.min.js}"></script>
 <script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
 <script th:src="@{/bootstrap/js/misconfiguraciones.js}"></script>
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script th:replace="js/tablas :: jsFactura"></script>
 </body>
 </html>
