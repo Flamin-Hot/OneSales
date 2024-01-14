@@ -128,10 +128,13 @@
                                    id="ticket" name="ticket"
                                    th:field="*{venta.id}"
                                    placeholder="Número de Ticket"
-                                   required="true">
+                                   required="true" pattern="\d+"
+                                   title="Por favor, ingresa solo números">
                             <small th:if="${#fields.hasErrors('venta.id')}" th:errors="*{venta.id}" class="text-danger"></small>
                         </div>
                     </div>
+
+
                     <div class="col-md-3 mx-auto mt-3">
                         <button type="submit" class="btn btn-primary">Generar</button>
                     </div>

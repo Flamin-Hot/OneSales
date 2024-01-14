@@ -24,5 +24,4 @@ public class CategoriaEntity {
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "categoria",cascade = CascadeType.REMOVE)
     private List<ProductoEntity> productos;
-
 }

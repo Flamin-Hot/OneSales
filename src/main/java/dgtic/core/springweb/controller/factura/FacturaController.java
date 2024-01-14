@@ -45,7 +45,6 @@ public class FacturaController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
         factura.setUsuario(usuarioEntity);
-        System.out.println(factura);
         try {
             FacturaEntity facturaGenerada = facturaService.nuevaFactura(factura);
             facturaService.generarFactura(facturaGenerada);
