@@ -127,7 +127,7 @@
                     <tr th:each="de: ${detalle}">
                         <td th:text="${de.metodo}" width="250"></td>
                         <td th:text="${de.cantidad}" width="250"></td>
-                        <td th:text="${de.total}" width="250"></td>
+                        <td th:text="${#numbers.formatDecimal(de.total, 1, 2,'POINT')}" width="250"></td>
                     </tr>
                 </tbody>
             </table>

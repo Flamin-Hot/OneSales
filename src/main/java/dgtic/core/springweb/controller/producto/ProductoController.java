@@ -32,7 +32,7 @@ public class ProductoController {
     @Autowired
     CategoriaService categoriaService;
 
-
+    //Controlador para dar alta un producto
     @GetMapping("alta-producto")
     public String altaProducto(Model model){
 
@@ -42,19 +42,18 @@ public class ProductoController {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
 
-        //Debemos declarar un objeto de tipo CategoriaEntity pues esta pagina contiene un
-        //formulario que va a ser llenando y mapeado al objeto que estamos pasando
         ProductoEntity productoEntity = new ProductoEntity();
-        //Como el producto pertenece a una categoria debemos de mostrar una lista desplegable con las cateogiras existentes
+
         List<CategoriaEntity> select = categoriaService.buscarCategoria();
-        //Mediante el model enviamos los objetos a usar en esta pagina
+
         model.addAttribute("metodo","Registrar Producto");
         model.addAttribute("productoEntity",productoEntity);
         model.addAttribute("selectCategoria",select);
-        //Nos vamos a la pagina correspondiente
+
         return "producto/alta-producto";
     }
 
+    //Controlador para guardar el producto
     @PostMapping("formulario")
     public String registrarProducto(@Valid @ModelAttribute("productoEntity")ProductoEntity producto, BindingResult bindingResult, Model model){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,7 +63,6 @@ public class ProductoController {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
 
-        //Llenar lista desplegable de categorias
         List<CategoriaEntity> select = categoriaService.buscarCategoria();
         if (bindingResult.hasErrors()) {
             model.addAttribute("selectCategoria",select);
@@ -91,7 +89,7 @@ public class ProductoController {
     }
 
 
-    //Hacemos un metodo get pues queremos mostrar la pagina que despliega la lista de productos
+    ///Controlador para mostrar la lista de productos
     @GetMapping("lista-producto")
     public String paginaLista(@RequestParam(name = "page",defaultValue = "0") int page,Model model){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -100,20 +98,21 @@ public class ProductoController {
         if (usuarioEntity != null) {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
-        //Logica para mostar los productos
+
         Pageable pagReq = PageRequest.of(page,5);
         Page<ProductoEntity> producto = productoService.findAll(pagReq);
         RenderPagina<ProductoEntity> render = new RenderPagina<>("lista-producto",producto);
-        //Mandamos al front lo que queremos que se muestre
+
         model.addAttribute("page",render);
-        //Y las entidades que debe mostrar
+
         model.addAttribute("producto",producto);
-        //Ademas de un titulo de lo que se esta mostrando
+
         model.addAttribute("operacion","Productos Resgistrados");
-        //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
+
         return "producto/lista-producto";
     }
 
+    //Controlador para modificar un producto
     @GetMapping("modificar-producto/{id}")
     public String saltoModificar(@PathVariable("id") Integer id, Model model,HttpSession session) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -125,12 +124,13 @@ public class ProductoController {
 
         ProductoEntity producto = productoService.buscarProductoId(id);
         model.addAttribute("productoEntity", producto);
-        //llenar el select de hoteles
+
         List<CategoriaEntity> select=categoriaService.buscarCategoria();
         model.addAttribute("selectCategoria",select);
         return "producto/alta-producto";
     }
 
+    //Controlador para eliminar un producto
     @GetMapping("borrar-producto/{id}")
     public String borrarCategoria(@PathVariable(name = "id") Integer id, Model model, RedirectAttributes redirectAttributes){
         ProductoEntity producto = productoService.buscarProductoId(id);

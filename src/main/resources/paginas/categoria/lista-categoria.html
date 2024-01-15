@@ -134,7 +134,7 @@
                     <a th:href="@{/categoria/modificar-categoria/{id} (id=${ca.id})}"
                        class="btn btn-outline-success"
                        th:disabled="${!usuarioEntity.tipoUsuario}"
-                       th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                       th:classappend="${!usuarioEntity.tipoUsuario or (ca.id == 1)}? 'btn-disabled' : ''"
                     >
                         <i class="fas fa-pencil-alt" aria-hidden="true"></i> Modificar
                     </a>
@@ -142,7 +142,7 @@
                     <a th:href="@{/categoria/borrar-categoria/{id} (id=${ca.id})}"
                        class="btn btn-outline-danger"
                        th:disabled="${!usuarioEntity.tipoUsuario}"
-                       th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                       th:classappend="${!usuarioEntity.tipoUsuario or (ca.id == 1)}? 'btn-disabled' : ''"
                     >
                         <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
                     </a>

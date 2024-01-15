@@ -22,6 +22,6 @@ public class CategoriaEntity {
     @NotBlank
     private String descripcion;
 
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "categoria",cascade = CascadeType.REMOVE)
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "categoria")
     private List<ProductoEntity> productos;
 }

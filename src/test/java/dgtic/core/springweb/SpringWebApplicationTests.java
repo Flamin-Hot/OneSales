@@ -36,6 +36,9 @@ class SpringWebApplicationTests {
 	@Autowired
 	FacturaRepository facturaRepository;
 
+	@Autowired
+	ProductoRepository productoRepository;
+
 	@Test
 	void contextLoads() {
 		List<ProductoCantidadDTO> detalles = detalleVentaRepository.obtenerTopProductos();
@@ -88,5 +91,20 @@ class SpringWebApplicationTests {
 						((Number) resultado[2]).longValue()))
 				.collect(Collectors.toList());
 		x.forEach(System.out::println);
+	}
+
+	@Test
+	void c() {
+		List<ProductoEntity> productos = productoRepository.findAllByCategoriaId(3);
+		for (ProductoEntity prod: productos) {
+			System.out.println(prod.getId()+" " + prod.getNombre());
+		}
+	}
+	@Test
+	void d() {
+		List<DetalleVentaEntity> detalles = detalleVentaRepository.findByVentaId(10);
+		for (DetalleVentaEntity detalle: detalles) {
+			System.out.println(detalle.getProducto().getId());
+		}
 	}
 }

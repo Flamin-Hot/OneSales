@@ -1,10 +1,7 @@
 package dgtic.core.springweb.service.venta;
 
 import dgtic.core.springweb.model.*;
-import dgtic.core.springweb.repository.DetalleVentaRepository;
-import dgtic.core.springweb.repository.MetodoPagoRepository;
-import dgtic.core.springweb.repository.ProductoRepository;
-import dgtic.core.springweb.repository.VentaRepository;
+import dgtic.core.springweb.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +29,9 @@ public class VentaServiceImpl implements VentaService{
     @Autowired
     MetodoPagoRepository metodoPagoRepository;
 
+    @Autowired
+    FacturaRepository facturaRepository;
+
     @Override
     public VentaEntity obtenerVentaPorId(Integer id) {
         Optional<VentaEntity> venta = ventaRepository.findById(id);
@@ -49,7 +49,23 @@ public class VentaServiceImpl implements VentaService{
 
     @Override
     public void eliminarVenta(Integer id) {
-        ventaRepository.deleteById(id);
+        List<DetalleVentaEntity> detalles = detalleVentaRepository.findByVentaId(id);
+        if (detalles.isEmpty()){
+            ventaRepository.deleteById(id);
+            return;
+        }else {
+            if (facturaRepository.findByVentaId(id)!=null){
+                throw new IllegalStateException("La venta no puede ser eliminada porque ya ha sido facturada.");
+            }else {
+                for (DetalleVentaEntity detalle: detalles) {
+                    Optional<ProductoEntity> producto = productoRepository.findById(detalle.getProducto().getId());
+                    producto.get().getInventario().setStock(producto.get().getInventario().getStock()+detalle.getCantidad());
+                    productoRepository.save(producto.get());
+                    detalleVentaRepository.delete(detalle);
+                }
+                ventaRepository.deleteById(id);
+            }
+        }
     }
 
     @Override

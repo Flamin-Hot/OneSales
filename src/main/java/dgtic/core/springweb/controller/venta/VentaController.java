@@ -13,6 +13,7 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
@@ -55,6 +57,7 @@ public class VentaController {
     MetodoPagoRepository metodoPagoRepository;
 
 
+    //Controlador para crear una venta
     @GetMapping("nueva-venta")
     public String nuevaVenta(Model model, HttpSession session){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -69,6 +72,7 @@ public class VentaController {
         return "venta/nueva-venta";
     }
 
+    //Controlador para guardar la venta
     @PostMapping("nueva-venta")
     public String nuevaVenta(@ModelAttribute("ventaEntity") VentaEntity venta, HttpSession session){
         VentaEntity ventaSession = (VentaEntity) session.getAttribute("venta");
@@ -81,6 +85,7 @@ public class VentaController {
         return "redirect:/venta/detalle-venta";
     }
 
+    //Controlador para mostrar los detalles de la venta creada anteriomente
     @GetMapping("detalle-venta")
     public String detalleVenta(Model model, HttpSession session) {
 
@@ -115,6 +120,7 @@ public class VentaController {
         return "venta/detalle-venta";
     }
 
+    //Controlador para agregar un producto al detalle de la venta
     @PostMapping("detalle-venta/agregar-producto")
     public String agregarProductoAlDetalle(@ModelAttribute("detalleVentaEntity") DetalleVentaEntity detalleVenta,
                                            HttpSession session, RedirectAttributes redirectAttributes) {
@@ -135,6 +141,7 @@ public class VentaController {
         }
     }
 
+    //Controlador para finalizar por completo la venta
     @PostMapping("detalle-venta/finalizar-venta")
     public String finalizarVenta(@RequestParam(name = "idMetodo",required = false) Integer idMetodo,HttpSession session, RedirectAttributes redirectAttributes) {
         VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
@@ -148,6 +155,7 @@ public class VentaController {
 
         try {
             ventaService.finalizarVenta(ventaNueva, detallesTemporales,idMetodo);
+            gmail(ventaNueva,detallesTemporales);
             detallesTemporales.clear();
             session.removeAttribute("ventaNueva");
             session.removeAttribute("ventaIniciada");
@@ -158,6 +166,7 @@ public class VentaController {
         }
     }
 
+    //Controlador para eliminar un producto del detalle de la venta que se quiere crear
     @PostMapping("detalle-venta/eliminar-detalle")
     public String eliminarDetalle(@RequestParam("detalleIndex") int detalleIndex, RedirectAttributes redirectAttributes,HttpSession session) {
         List<DetalleVentaEntity> detallesTemporales = (List<DetalleVentaEntity>) session.getAttribute("detallesTemporales");
@@ -170,6 +179,7 @@ public class VentaController {
         return "redirect:/venta/detalle-venta";
     }
 
+    //Controlador para eliminar la venta en caso de que se presione un link durante la venta en curso
     @GetMapping("eliminar-venta")
     public String eliminarVenta(HttpSession session) {
         VentaEntity ventaNueva = (VentaEntity) session.getAttribute("ventaNueva");
@@ -185,16 +195,38 @@ public class VentaController {
         return "redirect:/aplicacion";
     }
 
+    //Controlador para eliminar una venta del listado de ventas registradas
+    @GetMapping("borrar-venta/{id}")
+    public String borrarVentaRegistrada(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            VentaEntity venta = ventaService.obtenerVentaPorId(id);
+
+            if (venta != null) {
+                ventaService.eliminarVenta(venta.getId());
+                redirectAttributes.addFlashAttribute("success", "Venta eliminada exitosamente!");
+            } else {
+                redirectAttributes.addFlashAttribute("error", "La venta no existe!");
+            }
+        } catch (DataIntegrityViolationException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", "La venta no puede ser eliminada porque ya ha sido facturada.");
+        }
+        return "redirect:/venta/lista-venta";
+    }
+
+
+    //Controlador para buscar el cliente al querer realziar una venta
     @GetMapping(value = "buscar-cliente/{dato}",produces = "application/json")
     public @ResponseBody List<ClienteEntity> buscarCliente(@PathVariable String dato){
         return clienteService.buscarClientePatron(dato);
     }
 
+    //Controlador para buscar un producto
     @GetMapping(value = "buscar-producto/{nombre}",produces = "application/json")
     public @ResponseBody List<ProductoEntity> buscarProducto(@PathVariable String nombre){
         return productoService.buscarProductoPatron(nombre);
     }
 
+    //Controlador para mostrar la lista de ventas registradas
     @GetMapping("lista-venta")
     public String paginaLista(@RequestParam(name = "page",defaultValue = "0") int page,Model model){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -203,20 +235,21 @@ public class VentaController {
         if (usuarioEntity != null) {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
-        //Logica para mostar los productos
+
         Pageable pagReq = PageRequest.of(page,5);
         Page<VentaEntity> venta = ventaService.findAll(pagReq);
         RenderPagina<VentaEntity> render = new RenderPagina<>("lista-venta",venta);
-        //Mandamos al front lo que queremos que se muestre
+
         model.addAttribute("page",render);
-        //Y las entidades que debe mostrar
+
         model.addAttribute("venta",venta);
-        //Ademas de un titulo de lo que se esta mostrando
+
         model.addAttribute("operacion","Ventas Realizadas");
-        //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
+
         return "venta/lista-venta";
     }
 
+    //Controlador para mostrar el detalle de una venta realizada
     @GetMapping("detalle-venta/{id}")
     public ResponseEntity<?> showDetalleVenta(@PathVariable("id") Integer id) {
         List<DetalleVentaEntity> detalleVenta = detalleVentaRepository.findByVentaId(id);
@@ -227,22 +260,22 @@ public class VentaController {
         }
     }
 
+    //Controlador para enviar por email el ticket de la venta
     @GetMapping("enviar-mail/{id}")
     public String enviarMail(@PathVariable(name = "id") Integer id,Model model, RedirectAttributes redirectAttributes){
 
         Optional<VentaEntity> venta = ventaRepository.findById(id);
         List<DetalleVentaEntity> detalleVenta = detalleVentaRepository.findByVentaId(venta.get().getId());
-        if (venta.isPresent()){
-            String correo = venta.get().getCliente().getEmail();
+        if (venta.isPresent() & !detalleVenta.isEmpty()){
             gmail(venta.get(),detalleVenta);
             redirectAttributes.addFlashAttribute("success","Correo enviado correctamente!");
-            return "redirect:/venta/lista-venta";
         }else {
             redirectAttributes.addFlashAttribute("error","No se encontro la venta");
-            return "redirect:/venta/lista-venta";
         }
+        return "redirect:/venta/lista-venta";
     }
 
+    //Metodo para enviar el ticket
     private void gmail(VentaEntity venta,List<DetalleVentaEntity> detalleVenta){
         String gmail="haloemiliano93@gmail.com";
         String pswd="ggej jmbg zqyw ckwp";

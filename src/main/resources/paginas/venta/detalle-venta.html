@@ -125,7 +125,8 @@
                                    id="cantidad" name="cantidad"
                                    th:field="*{cantidad}"
                                    placeholder="Cantidad"
-                                   required="true">
+                                   required="true" pattern="\d+"
+                                   title="Por favor, ingresa solo números">
                         </div>
                     </div>
                 </div>
@@ -172,7 +173,7 @@
                         <td colspan="2"></td>
                         <td><strong>Total Venta:</strong></td>
                         <td>
-                            <span th:text="${#aggregates.sum(detallesTemporales.![cantidad * producto.precio])}"></span>
+                            <span th:text="${#numbers.formatDecimal(#aggregates.sum(detallesTemporales.![cantidad * producto.precio]), 1,2, 'POINT')}"></span>
                         </td>
                     </tr>
                     <tr>

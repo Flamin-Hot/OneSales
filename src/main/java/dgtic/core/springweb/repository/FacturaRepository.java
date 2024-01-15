@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FacturaRepository extends JpaRepository<FacturaEntity,Integer> {
+    FacturaEntity findByVentaId(Integer id);
 }

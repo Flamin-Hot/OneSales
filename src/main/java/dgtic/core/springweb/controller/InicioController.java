@@ -35,15 +35,13 @@ public class InicioController {
     @Autowired
     VentaService ventaService;
 
-    //Cuando se despliega la aplicacion hacemos un get para obtener la pagina de inicio
+    //Controlador que muestra el login
     @GetMapping("")
     public String paginaInicio(Model model) {
-        //La pagina de inicio muestra un formulario para iniciar sesion o registrar un usuario
         return "inicio";
     }
 
-    //Es es el controlador encargado de mostrar la pagina aplicacion
-    //Es un get pues indicamos que debe mostrar la pagina y algunos atributos de la session
+    ////Controlador que muestra la pagina principal
     @GetMapping("aplicacion")
     public String aplicacion(@RequestParam(name = "fecha", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,7 +60,6 @@ public class InicioController {
 
 
         if (!venta.isEmpty()) {
-            // Cálculo del total usando Streams
             Double total = venta.stream().mapToDouble(VentaEntity::getTotal).sum();
 
             BalanceDTO balance = new BalanceDTO(usuarioEntity.getNombre(), venta.size(), total, Date.valueOf(fecha));
@@ -76,7 +73,6 @@ public class InicioController {
             model.addAttribute("detalle", detalle);
         }
 
-        // Mostramos el Dashboard
         List<ProductoCantidadDTO> pc = detalleVentaRepository.obtenerTopProductos();
         List<ProductoCantidadDTO> primeros5 = pc.subList(0, Math.min(5, pc.size()));
         List<ProductoCantidadDTO> ultimos5 = pc.subList(Math.max(0, pc.size() - 5), pc.size());

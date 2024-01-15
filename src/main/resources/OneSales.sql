@@ -96,6 +96,7 @@ CREATE TABLE factura(
 INSERT INTO cliente (nombre,apellido,email,telefono,rfc) VALUES ("Jhon","Doe","jhondoe@mail.com","5512435687","XXXXXXXXXX");
 INSERT INTO cliente (nombre,apellido,email,telefono,rfc) VALUES ("Jan","Doe","jandoe@mail.com","5521346578","YYYYYYYYYYYYY");
 
+INSERT INTO categoria (nombre, descripcion) VALUES ('Sin Categoría', 'Productos sin categoría');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Electrónica', 'Productos electrónicos de última generación');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Ropa', 'Prendas de vestir para todas las edades');
 INSERT INTO categoria (nombre, descripcion) VALUES ('Hogar', 'Artículos para el hogar');
@@ -118,13 +119,13 @@ INSERT INTO inventario (stock) VALUES (4);
 INSERT INTO inventario (stock) VALUES (2);
 
 -- Asignación de productos a categorías
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Smartphone', 'Teléfono inteligente de alta gama', 799.99, 1, 1);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Laptop', 'Portátil ultradelgado', 1299.99, 2, 1);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Camiseta', 'Camiseta de algodón para hombres', 19.99, 3, 2);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Mueble de Salón', 'Sofá de cuero para la sala de estar', 799.99, 4, 3);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Balón de Fútbol', 'Balón oficial de la FIFA', 29.99, 5, 4);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Muñeca Barbie', 'Muñeca Barbie clásica', 12.99, 6, 5);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Tablet', 'Tablet de 10 pulgadas', 249.99, 7, 1);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Zapatillas Deportivas', 'Zapatillas para correr', 59.99, 8, 4);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Juego de Construcción', 'Set de construcción para niños', 39.99, 9, 5);
-INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Refrigerador', 'Refrigerador de acero inoxidable', 899.99, 10, 3);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Smartphone', 'Teléfono inteligente de alta gama', 799.99, 1, 2);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Laptop', 'Portátil ultradelgado', 1299.99, 2, 2);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Camiseta', 'Camiseta de algodón para hombres', 19.99, 3, 3);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Mueble de Salón', 'Sofá de cuero para la sala de estar', 799.99, 4, 4);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Balón de Fútbol', 'Balón oficial de la FIFA', 29.99, 5, 5);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Muñeca Barbie', 'Muñeca Barbie clásica', 12.99, 6, 6);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Tablet', 'Tablet de 10 pulgadas', 249.99, 7, 2);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Zapatillas Deportivas', 'Zapatillas para correr', 59.99, 8, 3);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Juego de Construcción', 'Set de construcción para niños', 39.99, 9, 4);
+INSERT INTO producto (nombre, descripcion, precio, inventario_id, categoria_id) VALUES ('Refrigerador', 'Refrigerador de acero inoxidable', 899.99, 10, 4);

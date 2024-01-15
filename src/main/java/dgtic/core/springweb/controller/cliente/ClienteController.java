@@ -27,31 +27,28 @@ public class ClienteController {
     @Autowired
     ClienteService clienteService;
 
-    //Cuando se presione el boton para dar de alta un nuevo cliente este controlador
-    //debe tomar la solicitud, la solicitud es de tipo get, pues con el boton estamos
-    //inidicando que se debe mostrar y dirigir a la pagina para dar de alta a un cliente
+    //Controlador para mostrar el formulario de agregar cliente
     @GetMapping("alta-cliente")
-    public String altaCliente(Model model){
+    public String altaCliente(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
 
         if (usuarioEntity != null) {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
-        //Debemos declarar un objeto de tipo CategoriaEntity pues esta pagina contiene un
-        //formulario que va a ser llenando y mapeado al objeto que estamos pasando
+
         ClienteEntity clienteEntity = new ClienteEntity();
-        //Mediante el model enviamos los objetos a usar en esta pagina
-        model.addAttribute("metodo","Registrar Cliente");
-        model.addAttribute("clienteEntity",clienteEntity);
-        //Nos vamos a la pagina correspondiente
+
+        model.addAttribute("metodo", "Registrar Cliente");
+        model.addAttribute("clienteEntity", clienteEntity);
+
         return "cliente/alta-cliente";
     }
 
-    //Este controlador se hara cargo de mapear los datos del formulario al objeto
-    //ademas de guardarlo en la bd
+
+    //Controlador para insertar un cliente
     @PostMapping("formulario")
-    public String registrarCliente(@Valid @ModelAttribute("clienteEntity")ClienteEntity cliente, BindingResult bindingResult, Model model){
+    public String registrarCliente(@Valid @ModelAttribute("clienteEntity") ClienteEntity cliente, BindingResult bindingResult, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
 
@@ -64,16 +61,16 @@ public class ClienteController {
         }
 
         try {
-            if (cliente.getId()==null){
+            if (cliente.getId() == null) {
                 clienteService.guardar(cliente);
                 return "redirect:/cliente/lista-cliente";
-            }else{
+            } else {
                 clienteService.guardar(cliente);
                 return "redirect:/cliente/lista-cliente";
             }
-        }catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("Duplicate entry")) {
-                // Aquí puedes verificar si el correo electrónico o el teléfono están duplicados
+
                 if (e.getMessage().contains("cliente.email")) {
                     bindingResult.rejectValue("email", "error.clienteEntity", "El correo ya se encuentra registrado!");
                 } else if (e.getMessage().contains("cliente.telefono")) {
@@ -84,9 +81,9 @@ public class ClienteController {
         }
     }
 
+    //Controlador para maostrar la lista de clientes
     @GetMapping("lista-cliente")
-    //Recibe la session del controlador post de login
-    public String paginaLista(@RequestParam(name = "page",defaultValue = "0") int page, Model model) {
+    public String paginaLista(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UsuarioEntity usuarioEntity = (UsuarioEntity) authentication.getPrincipal();
 
@@ -94,19 +91,20 @@ public class ClienteController {
             model.addAttribute("usuarioEntity", usuarioEntity);
         }
 
-        Pageable pagReq = PageRequest.of(page,5);
+        Pageable pagReq = PageRequest.of(page, 5);
         Page<ClienteEntity> cliente = clienteService.findAll(pagReq);
-        RenderPagina<ClienteEntity> render = new RenderPagina<>("lista-cliente",cliente);
-        //Mandamos al front lo que queremos que se muestre
-        model.addAttribute("page",render);
-        //Y las entidades que debe mostrar
-        model.addAttribute("cliente",cliente);
-        //Ademas de un titulo de lo que se esta mostrando
-        model.addAttribute("operacion","Clientes Resgistrados");
-        //Mandamos a la pagina correspondiente cuando se apriete lista-cliente
+        RenderPagina<ClienteEntity> render = new RenderPagina<>("lista-cliente", cliente);
+
+        model.addAttribute("page", render);
+
+        model.addAttribute("cliente", cliente);
+
+        model.addAttribute("operacion", "Clientes Resgistrados");
+
         return "cliente/lista-cliente";
     }
 
+    //Controlador para modificar un cliente
     @GetMapping("modificar-cliente/{id}")
     public String saltoModificar(@PathVariable("id") Integer id, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -120,14 +118,19 @@ public class ClienteController {
         return "cliente/alta-cliente";
     }
 
+    //Controaldor para eliminar un cliente
     @GetMapping("borrar-cliente/{id}")
     public String borrarCliente(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
         ClienteEntity cliente = clienteService.buscarClienteId(id);
         if (cliente != null) {
-            clienteService.borrar(id);
-            redirectAttributes.addFlashAttribute("success", "Cliente borrado exitosamente!");
+            try {
+                clienteService.borrar(id);
+                redirectAttributes.addFlashAttribute("success", "Cliente borrado exitosamente!");
+            } catch (DataIntegrityViolationException e) {
+                redirectAttributes.addFlashAttribute("error", "No se puede borrar el cliente debido a ventas asociadas");
+            }
         }
         return "redirect:/cliente/lista-cliente";
     }
-    
+
 }

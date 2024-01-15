@@ -11,6 +11,9 @@ import java.util.List;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<ProductoEntity,Integer> {
+
+    List<ProductoEntity> findAllByCategoriaId(Integer id);
+
     @Query("select p from producto p where p.nombre like %?1%")
     public List<ProductoEntity> findByNombrePatron(String nombre);
 

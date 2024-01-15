@@ -26,6 +26,19 @@
             overflow: auto;
         }
     </style>
+    <style>
+        .btn-disabled {
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+    <style>
+        .dataTables_wrapper {
+            width: 95%;
+            overflow: auto;
+        }
+    </style>
 </head>
 <body>
 <!-- Header -->
@@ -171,6 +184,13 @@
                 </div>
                 <a th:href="@{/venta/enviar-mail/{id} (id=${ve.id})}" class="btn btn-outline-blue">
                     <i class="fas fa-envelope" aria-hidden="true"></i> Enviar
+                </a>
+                <a th:href="@{/venta/borrar-venta/{id} (id=${ve.id})}"
+                   class="btn btn-outline-danger"
+                   th:disabled="${!usuarioEntity.tipoUsuario}"
+                   th:classappend="${usuarioEntity.tipoUsuario}? '' : 'btn-disabled'"
+                >
+                    <i class="fas fa-trash" aria-hidden="true"></i> Eliminar
                 </a>
             </td>
         </tr>
